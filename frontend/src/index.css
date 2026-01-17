@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-.active hr{
-    @apply block mx-auto
+.active hr {
+  @apply block mx-auto;
+}
+
+::-webkit-scrollbar {
+  @apply hidden;
 }

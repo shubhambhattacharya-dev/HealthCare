@@ -9,6 +9,7 @@ import MyAppointmentPage from './pages/MyAppooitmentPage.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
 import Navbar from './components/Navbar.jsx'
 import Appointment from './pages/Appointment.jsx'
+import Footer from './components/Footer.jsx'
 
 const App = () => {
   return (
@@ -26,6 +27,7 @@ const App = () => {
       <Route path="/Profile" element={<ProfilePage/>}/>
      
       </Routes>
+      <Footer/>
       </div>
   )
   }
