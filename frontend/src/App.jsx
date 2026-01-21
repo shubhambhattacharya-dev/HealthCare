@@ -5,7 +5,7 @@ import DoctorPage from './pages/DoctorPage.jsx'
 import AboutPage from './pages/AboutPage.jsx'
 import ContactPage from './pages/contactPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
-import MyAppointmentPage from './pages/MyAppooitmentPage.jsx'
+import MyAppointmentPage from './pages/MyAppointmentPage.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
 import Navbar from './components/Navbar.jsx'
 import Appointment from './pages/Appointment.jsx'
@@ -24,7 +24,7 @@ const App = () => {
       <Route path="/contact" element={<ContactPage/>}/>
       <Route path="/login" element={<LoginPage/>}/>
       <Route path="/my-appointments" element={<MyAppointmentPage/>}/>
-      <Route path="appointment/:docId" element={<Appointment/>}/>
+      <Route path="/appointment/:docId" element={<Appointment/>}/>
       <Route path="/Profile" element={<ProfilePage/>}/>
      
       </Routes>
