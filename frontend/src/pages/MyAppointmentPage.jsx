@@ -27,7 +27,7 @@ const MyAppointmentPage = () => {
 
             <div className='flex-1 text-sm text-zinc-600'>
               <p className='text-neutral-800 font-semibold'>{item.name}</p>
-              <p>{item.speciality}</p>
+              <p>{item.specialty}</p>
 
               <p className='text-zinc-700 font-medium mt-1'>Address:</p>
               <p className='text-xs text-zinc-500'>{item.address.line1}</p>

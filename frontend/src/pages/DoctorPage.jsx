@@ -14,7 +14,7 @@ const DoctorPage = () => {
   const applyFilter = () => {
     const doctorsList = doctors || []
     if (Specialty) {
-      setFilterDoc(doctorsList.filter(doc => doc.speciality === Specialty))
+      setFilterDoc(doctorsList.filter(doc => doc.specialty === Specialty))
     } else {
       setFilterDoc(doctorsList)
     }
@@ -26,7 +26,7 @@ const DoctorPage = () => {
 
   return (
     <div>
-      <p className='text-gray-600'>Browse through the doctors specialist.</p>
+      <p className='text-gray-600'>Browse through the doctor specialists.</p>
 
       <div className='flex flex-col sm:flex-row items-start gap-5 mt-5'>
         <button
@@ -136,7 +136,7 @@ const DoctorPage = () => {
                 </div>
 
                 <p className='text-gray-900 text-lg font-medium'>{item.name}</p>
-                <p className='text-gray-600 text-sm'>{item.speciality}</p>
+                <p className='text-gray-600 text-sm'>{item.specialty}</p>
               </div>
             </div>
           ))}
