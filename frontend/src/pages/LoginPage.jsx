@@ -1,5 +1,4 @@
-import React from 'react'
-import { useState } from 'react'
+import React, { useState } from 'react';
 
 const LoginPage = () => {
 
@@ -10,7 +9,8 @@ const LoginPage = () => {
   const [name, setName] = useState('')
 
   const onSubmitHandler = async (event) => {
-    event.preventDefault()
+    event.preventDefault();
+    // TODO: Implement login/signup logic
   }
 
   return (
