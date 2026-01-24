@@ -4,20 +4,17 @@
 @tailwind components;
 @tailwind utilities;
 
-* {
-  font-family: Outfit;
-}
-
-.active hr {
-  @apply block mx-auto;
-}
-
-::-webkit-scrollbar {
-  @apply hidden;
-}
-
-@media (max-width: 740px) {
-  .active p {
-    @apply text-white bg-primary;
+@layer utilities {
+  .line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
   }
 }

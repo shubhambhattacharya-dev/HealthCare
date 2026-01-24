@@ -3,17 +3,21 @@ import { Routes , Route } from 'react-router-dom'
 import HomePage from './pages/HomePage.jsx'
 import DoctorPage from './pages/DoctorPage.jsx'
 import AboutPage from './pages/AboutPage.jsx'
-import ContactPage from './pages/ContactPage.jsx'
+import ContactPage from './pages/contactPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import MyAppointmentPage from './pages/MyAppointmentPage.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
 import Navbar from './components/Navbar.jsx'
 import Appointment from './pages/Appointment.jsx'
 import Footer from './components/Footer.jsx'
+import DesignSystemTest from './pages/DesignSystemTest.jsx'
+import ScrollToTop from './components/ScrollToTop.jsx'
+
 
 const App = () => {
   return (
     <div className='mx-4 sm:mx-[10%]'>
+      <ScrollToTop />
       <Navbar/>
       
     <Routes>
@@ -25,7 +29,9 @@ const App = () => {
       <Route path="/login" element={<LoginPage/>}/>
       <Route path="/my-appointments" element={<MyAppointmentPage/>}/>
       <Route path="/appointment/:docId" element={<Appointment/>}/>
-      <Route path="/Profile" element={<ProfilePage/>}/>
+      <Route path="/profile" element={<ProfilePage/>}/>
+      <Route path="/test" element={<DesignSystemTest />} />
+      
      
       </Routes>
       <Footer/>
