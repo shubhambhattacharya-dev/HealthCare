@@ -390,7 +390,7 @@ const AboutPage = () => {
                 <Button 
                   variant="primary" 
                   size="lg"
-                  className="bg-white text-primary-600 hover:bg-gray-100"
+                  className=" text-primary-600 hover:bg-gray-100"
                   onClick={() => window.location.href = '/doctors'}
                 >
                   <UserGroupIcon className="h-5 w-5 mr-2" />
