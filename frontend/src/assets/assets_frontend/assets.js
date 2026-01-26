@@ -16,6 +16,8 @@ import upload_icon from './upload_icon.png'
 import profile_pic from './profile_pic.png'
 import razorpay_logo from './razorpay_logo.png'
 import stripe_logo from './stripe_logo.png'
+import sun_icon from './sun_icon.svg'
+import moon_icon from './moon_icon.svg'
 import doc1 from './doc1.png'
 import doc2 from './doc2.png'
 import doc3 from './doc3.png'
@@ -57,6 +59,8 @@ export const assets = {
   profile_pic,
   razorpay_logo,
   stripe_logo,
+  sun_icon,
+  moon_icon,
   doc1,
   doc2,
   doc3,
@@ -434,7 +438,7 @@ export const specialityData = [
   },
   {
     specialty: 'Gynecology',
-    image: 'https://cdn-icons-png.flaticon.com/512/3050/3050558.png',
+    image: 'https://cdn-icons-png.flaticon.com/512/3050/3050564.png',
   },
   {
     specialty: 'Surgery',

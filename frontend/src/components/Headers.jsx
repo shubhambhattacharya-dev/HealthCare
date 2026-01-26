@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { motion, useAnimation } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { assets } from '../assets/assets_frontend/assets';
 import Button from '../design-system/components/button.jsx';
-import { 
+import {
   CalendarDaysIcon,
   ShieldCheckIcon,
   ClockIcon,
@@ -19,7 +19,6 @@ import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 
 const Headers = () => {
   const navigate = useNavigate();
-  const controls = useAnimation();
   const [typedText, setTypedText] = useState('');
   const fullText = "in under 60 seconds";
 
@@ -57,17 +56,7 @@ const Headers = () => {
     return () => clearInterval(typingInterval);
   }, []);
 
-  // Floating animation for doctor image
-  useEffect(() => {
-    controls.start({
-      y: [0, -10, 0],
-      transition: {
-        duration: 4,
-        repeat: Infinity,
-        ease: "easeInOut"
-      }
-    });
-  }, [controls]);
+  // Floating animation for doctor image - using CSS animation instead
 
   const handleBookAppointment = () => {
     navigate('/doctors');
@@ -89,21 +78,14 @@ const Headers = () => {
         
         {/* Floating Particles */}
         {[...Array(20)].map((_, i) => (
-          <motion.div
+          <div
             key={i}
             className="absolute w-1 h-1 bg-white/30 rounded-full"
-            initial={{
-              x: (i * 5) % 100 + 'vw',
-              y: (i * 7) % 100 + 'vh',
-            }}
-            animate={{
-              y: [null, -20, 0],
-              opacity: [0, 1, 0],
-            }}
-            transition={{
-              duration: 3 + (i * 0.1),
-              repeat: Infinity,
-              delay: i * 0.1,
+            style={{
+              left: `${(i * 5) % 100}vw`,
+              top: `${(i * 7) % 100}vh`,
+              animation: `float 3s ease-in-out infinite`,
+              animationDelay: `${i * 0.1}s`
             }}
           />
         ))}
@@ -251,7 +233,6 @@ const Headers = () => {
 
           {/* Right Content - Doctor Image */}
           <motion.div
-            animate={controls}
             className="relative"
           >
             {/* Main Doctor Image */}

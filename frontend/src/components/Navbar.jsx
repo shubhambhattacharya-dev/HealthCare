@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { NavLink, useNavigate, useLocation } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, User, Calendar, LogOut, Bell, ChevronDown, Search } from 'lucide-react'
 
 // Design System Components
@@ -9,6 +8,7 @@ import Badge from '../design-system/components/Badge.jsx'
 
 // Assets
 import { assets } from '../assets/assets_frontend/assets'
+import { AppContext } from '../context/AppContext.jsx'
 
 const Navbar = () => {
   const navigate = useNavigate()
@@ -17,6 +17,7 @@ const Navbar = () => {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false)
   const [token, setToken] = useState(true)
   const [isScrolled, setIsScrolled] = useState(false)
+  const { darkMode, toggleDarkMode } = useContext(AppContext)
 
   // Handle scroll effect
   useEffect(() => {
@@ -53,33 +54,29 @@ const Navbar = () => {
 
   return (
     <>
-      <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.3 }}
+      <nav
         className={`sticky top-0 z-50 transition-all duration-300 ${
           isScrolled
-            ? 'bg-white/95 backdrop-blur-xl shadow-lg border-b border-gray-200/50'
-            : 'bg-white border-b border-gray-200'
-        } text-gray-900`}
+            ? 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-lg border-b border-gray-200/50 dark:border-gray-700/50'
+            : 'bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800'
+        } text-gray-900 dark:text-gray-100`}
       >
         <div className="container-custom">
           <div className="flex items-center justify-between h-20">
             
             {/* Logo Section */}
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="flex items-center space-x-3 cursor-pointer group"
+            <div
+              className="flex items-center space-x-3 cursor-pointer group hover:scale-105 transition-transform"
               onClick={() => navigate('/')}
             >
               <div className="h-12 w-12 bg-primary-600 rounded-xl flex items-center justify-center shadow-md border-2 border-blue-700">
                 <span className="text-primary-100 font-black text-xl drop-shadow-lg">P</span>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Prescripto</h1>
-                <p className="text-xs text-gray-500">Healthcare Appointments</p>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Prescripto</h1>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Healthcare Appointments</p>
               </div>
-            </motion.div>
+            </div>
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center space-x-8">
@@ -90,24 +87,16 @@ const Navbar = () => {
                   className={({ isActive }) =>
                     `relative text-sm font-semibold transition-all duration-200 ${
                       isActive
-                        ? 'text-primary-600'
-                        : 'text-gray-700 hover:text-primary-500'
+                        ? 'text-primary-600 dark:text-primary-400'
+                        : 'text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400'
                     }`
                   }
                 >
-                  <motion.span
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="block"
-                  >
+                  <span className="block">
                     {link.name}
-                  </motion.span>
+                  </span>
                   {location.pathname === link.path && (
-                    <motion.div
-                      layoutId="navbar-indicator"
-                      className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary-500 rounded-full"
-                    />
+                    <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary-500 rounded-full" />
                   )}
                 </NavLink>
               ))}
@@ -115,25 +104,37 @@ const Navbar = () => {
 
             {/* Right Section */}
             <div className="flex items-center space-x-4">
-              {/* Search Button (Desktop) */}
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="hidden lg:flex items-center space-x-2 px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
-                onClick={() => navigate('/doctors')}
+              {/* Dark Mode Toggle */}
+              <button
+                onClick={toggleDarkMode}
+                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all hover:scale-110 active:scale-95"
               >
-                <Search className="h-4 w-4 text-gray-500" />
-                <span className="text-sm text-gray-600">Search Doctors</span>
-              </motion.button>
+                <img src={darkMode === 'dark' ? assets.sun_icon : assets.moon_icon} alt="Toggle dark mode" className="w-5 h-5" />
+              </button>
+              
+              {/* Search Bar (Desktop) */}
+              <div className="hidden lg:flex items-center">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search doctors, specialties..."
+                    className="w-80 px-10 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 border-2 border-transparent focus:border-primary-500 focus:bg-white dark:focus:bg-gray-900 focus:outline-none transition-all text-sm"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        navigate('/doctors');
+                      }
+                    }}
+                  />
+                </div>
+              </div>
 
               {/* Notification Bell */}
               {token && (
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                <button
+                  className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all hover:scale-110 active:scale-95"
                 >
-                  <Bell className="h-5 w-5 text-gray-600" />
+                  <Bell className="h-5 w-5 text-gray-600 dark:text-gray-300" />
                   <Badge
                     variant="error"
                     size="xs"
@@ -141,17 +142,15 @@ const Navbar = () => {
                   >
                     3
                   </Badge>
-                </motion.button>
+              </button>
               )}
 
               {/* Profile Section */}
               {token ? (
                 <div className="relative profile-dropdown">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                  <button
                     onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-                    className="flex items-center space-x-3 p-2 rounded-xl hover:bg-gray-100 transition-all group"
+                    className="flex items-center space-x-3 p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all group hover:scale-105 active:scale-95"
                   >
                     <div className="relative">
                       <img
@@ -169,30 +168,25 @@ const Navbar = () => {
                       </Badge>
                     </div>
                     <div className="hidden lg:block text-left">
-                      <p className="text-sm font-semibold text-gray-900">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">
                         Dr. John Doe
                       </p>
-                      <p className="text-xs text-gray-500">Patient</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Patient</p>
                     </div>
                     <ChevronDown
-                      className={`h-4 w-4 text-gray-500 transition-transform ${
+                      className={`h-4 w-4 text-gray-500 dark:text-gray-400 transition-transform ${
                         showProfileDropdown ? 'rotate-180' : ''
                       }`}
                     />
-                  </motion.button>
+                  </button>
 
                   {/* Dropdown Menu */}
-                  <AnimatePresence>
-                    {showProfileDropdown && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        transition={{ duration: 0.2 }}
-                        className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden z-50"
-                      >
+                  {showProfileDropdown && (
+                    <div
+                      className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200"
+                    >
                         {/* Profile Header */}
-                        <div className="p-4 border-b border-gray-100">
+                        <div className="p-4 border-b border-gray-100 dark:border-gray-700">
                           <div className="flex items-center space-x-3">
                             <img
                               src={assets.profile_pic}
@@ -200,10 +194,10 @@ const Navbar = () => {
                               className="h-12 w-12 rounded-full ring-2 ring-primary-500 object-cover"
                             />
                             <div>
-                              <p className="font-semibold text-gray-900">
+                              <p className="font-semibold text-gray-900 dark:text-white">
                                 Dr. John Doe
                               </p>
-                              <p className="text-sm text-gray-500">
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
                                 johndoe@example.com
                               </p>
                             </div>
@@ -217,10 +211,10 @@ const Navbar = () => {
                               navigate('/profile')
                               setShowProfileDropdown(false)
                             }}
-                            className="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors"
+                            className="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                           >
                             <User className="h-5 w-5 text-gray-400" />
-                            <span className="text-gray-700">My Profile</span>
+                            <span className="text-gray-700 dark:text-gray-300">My Profile</span>
                           </button>
 
                           <button
@@ -228,10 +222,10 @@ const Navbar = () => {
                               navigate('/my-appointments')
                               setShowProfileDropdown(false)
                             }}
-                            className="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors"
+                            className="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                           >
                             <Calendar className="h-5 w-5 text-gray-400" />
-                            <span className="text-gray-700">Appointments</span>
+                            <span className="text-gray-700 dark:text-gray-300">Appointments</span>
                             <Badge variant="primary" size="sm" className="ml-auto">
                               2
                             </Badge>
@@ -239,7 +233,7 @@ const Navbar = () => {
                         </div>
 
                         {/* Logout */}
-                        <div className="border-t border-gray-100 p-2">
+                        <div className="border-t border-gray-100 dark:border-gray-700 p-2">
                           <button
                             onClick={handleLogout}
                             className="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-red-50 text-red-600 rounded-lg transition-colors"
@@ -248,9 +242,8 @@ const Navbar = () => {
                             <span>Logout</span>
                           </button>
                         </div>
-                      </motion.div>
+                      </div>
                     )}
-                  </AnimatePresence>
                 </div>
               ) : (
                 <div className="hidden lg:flex items-center space-x-3">
@@ -267,63 +260,54 @@ const Navbar = () => {
               )}
 
               {/* Mobile Menu Button */}
-              <motion.button
-                whileTap={{ scale: 0.9 }}
+              <button
                 onClick={() => setShowMenu(true)}
-                className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all active:scale-95"
               >
-                <Menu className="h-6 w-6 text-gray-700" />
-              </motion.button>
+                <Menu className="h-6 w-6 text-gray-700 dark:text-gray-300" />
+              </button>
             </div>
           </div>
         </div>
-      </motion.nav>
+      </nav>
 
       {/* Mobile Menu Overlay */}
-      <AnimatePresence>
-        {showMenu && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setShowMenu(false)}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 lg:hidden"
-            />
+      {showMenu && (
+        <>
+          {/* Backdrop */}
+          <div
+            onClick={() => setShowMenu(false)}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 lg:hidden animate-in fade-in duration-300"
+          />
 
-            {/* Mobile Menu Panel */}
-            <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'tween', duration: 0.3 }}
-              className="fixed right-0 top-0 bottom-0 w-full max-w-sm bg-white z-50 lg:hidden shadow-2xl overflow-y-auto"
-            >
+          {/* Mobile Menu Panel */}
+          <div
+            className="fixed right-0 top-0 bottom-0 w-full max-w-sm bg-white dark:bg-gray-900 z-50 lg:hidden shadow-2xl overflow-y-auto animate-in slide-in-from-right duration-300"
+          >
               {/* Header */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-800">
                 <div className="flex items-center space-x-3">
                   <div className="h-10 w-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center">
                     <span className="text-white font-bold text-lg">P</span>
                   </div>
-                  <h2 className="text-xl font-bold text-gray-900">Menu</h2>
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">Menu</h2>
                 </div>
                 <button
                   onClick={() => setShowMenu(false)}
-                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 >
                   <X className="h-6 w-6" />
                 </button>
               </div>
 
               {/* Search Bar */}
-              <div className="p-6 border-b border-gray-200">
+              <div className="p-6 border-b border-gray-200 dark:border-gray-800">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <input
                     type="text"
                     placeholder="Search doctors, specialties..."
-                    className="w-full pl-11 pr-4 py-3 bg-gray-100 rounded-xl border-2 border-transparent focus:border-primary-500 focus:bg-white outline-none transition-all"
+                    className="w-full pl-11 pr-4 py-3 bg-gray-100 dark:bg-gray-800 rounded-xl border-2 border-transparent focus:border-primary-500 focus:bg-white dark:focus:bg-gray-900 outline-none transition-all"
                   />
                 </div>
               </div>
@@ -339,8 +323,8 @@ const Navbar = () => {
                       className={({ isActive }) =>
                         `flex items-center justify-between px-4 py-3 rounded-xl transition-all ${
                           isActive
-                            ? 'bg-primary-50 text-primary-600 border-l-4 border-primary-500'
-                            : 'text-gray-700 hover:bg-gray-50'
+                            ? 'bg-primary-50 dark:bg-primary-500/10 text-primary-600 dark:text-primary-400 border-l-4 border-primary-500'
+                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
                         }`
                       }
                     >
@@ -379,7 +363,7 @@ const Navbar = () => {
 
                 {/* Profile Section */}
                 {token && (
-                  <div className="mt-8 pt-8 border-t border-gray-200">
+                  <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
                     <div className="flex items-center space-x-3 mb-6">
                       <img
                         src={assets.profile_pic}
@@ -387,7 +371,7 @@ const Navbar = () => {
                         className="h-12 w-12 rounded-full ring-2 ring-primary-500 object-cover"
                       />
                       <div>
-                        <p className="font-semibold text-gray-900">Dr. John Doe</p>
+                        <p className="font-semibold text-gray-900 dark:text-white">Dr. John Doe</p>
                         <Badge variant="success" size="sm" dot>
                           Online
                         </Badge>
@@ -400,9 +384,9 @@ const Navbar = () => {
                           navigate('/profile')
                           setShowMenu(false)
                         }}
-                        className="w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors"
+                        className="w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                       >
-                        <span className="text-gray-700">My Profile</span>
+                        <span className="text-gray-700 dark:text-gray-300">My Profile</span>
                         <User className="h-5 w-5 text-gray-400" />
                       </button>
 
@@ -411,9 +395,9 @@ const Navbar = () => {
                           navigate('/my-appointments')
                           setShowMenu(false)
                         }}
-                        className="w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors"
+                        className="w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                       >
-                        <span className="text-gray-700">Appointments</span>
+                        <span className="text-gray-700 dark:text-gray-300">Appointments</span>
                         <Badge variant="primary" size="sm">
                           2
                         </Badge>
@@ -432,15 +416,14 @@ const Navbar = () => {
               </div>
 
               {/* Footer */}
-              <div className="p-6 border-t border-gray-200">
-                <p className="text-sm text-gray-500 text-center">
+              <div className="p-6 border-t border-gray-200 dark:border-gray-800">
+                <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
                   © 2024 Prescripto. All rights reserved.
                 </p>
               </div>
-            </motion.div>
+            </div>
           </>
         )}
-      </AnimatePresence>
     </>
   )
 }

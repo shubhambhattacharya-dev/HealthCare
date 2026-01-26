@@ -1,12 +1,12 @@
 import React, { useContext, useState } from 'react'
-import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
-import { 
-  Star, 
-  Clock, 
-  MapPin, 
-  Users, 
-  Award, 
+import { motion } from 'framer-motion'
+import {
+  Star,
+  Clock,
+  MapPin,
+  Users,
+  Award,
   ChevronRight,
   Calendar,
   Shield,
@@ -89,7 +89,7 @@ const TopDoctors = () => {
 
         {/* Loading State */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(4)].map((_, i) => (
               <DoctorCardSkeleton key={i} />
             ))}
@@ -129,6 +129,7 @@ const TopDoctors = () => {
                           variant={doctor.available ? "success" : "warning"} 
                           dot
                           size="sm"
+                          className={doctor.available ? 'animate-pulse' : ''}
                         >
                           {doctor.available ? 'Available' : 'Busy'}
                         </Badge>

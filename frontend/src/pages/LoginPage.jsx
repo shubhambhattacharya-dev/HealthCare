@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate, Link } from 'react-router-dom'
 import {
   Mail,
@@ -127,11 +126,7 @@ const LoginPage = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-md mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
+          <div className="animate-fade-in">
             <Card className="shadow-card border-0 overflow-hidden">
               {/* Header */}
               <div className="bg-gradient-to-r from-primary-500 to-primary-600 p-8 text-center">
@@ -190,26 +185,20 @@ const LoginPage = () => {
                 </div>
 
                 <form onSubmit={onSubmitHandler} className="space-y-5">
-                  <AnimatePresence mode="wait">
-                    {state === 'Sign Up' && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                      >
-                        <Input
-                          label="Full Name"
-                          icon={User}
-                          placeholder="Enter your full name"
-                          name="name"
-                          value={formData.name}
-                          onChange={handleChange}
-                          error={errors.name}
-                          required
-                        />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  {state === 'Sign Up' && (
+                    <div className="animate-slide-down">
+                      <Input
+                        label="Full Name"
+                        icon={User}
+                        placeholder="Enter your full name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        error={errors.name}
+                        required
+                      />
+                    </div>
+                  )}
 
                   <Input
                     label="Email Address"
@@ -306,24 +295,22 @@ const LoginPage = () => {
               </div>
             </Card>
 
-            {/* Benefits Section */}
-            <div className="mt-8 grid grid-cols-2 gap-4">
+            {/* Benefits Section - simplified to 3 items */}
+            <div className="mt-8 grid grid-cols-3 gap-4">
               {benefits.map((benefit, index) => (
-                <motion.div
+                <div
                   key={index}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="text-center"
+                  className="text-center animate-fade-in"
+                  style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  <div className="h-12 w-12 bg-primary-100 rounded-xl flex items-center justify-center mx-auto mb-2">
+                  <div className="h-12 w-12 bg-primary-100 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-sm">
                     <benefit.icon className="h-6 w-6 text-primary-600" />
                   </div>
-                  <p className="text-sm text-gray-600">{benefit.text}</p>
-                </motion.div>
+                  <p className="text-sm text-gray-600 leading-tight">{benefit.text}</p>
+                </div>
               ))}
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </div>

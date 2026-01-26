@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { AppContext } from '../context/AppContext';
 import Card from '../design-system/components/Card.jsx';
 import Button from '../design-system/components/button.jsx';

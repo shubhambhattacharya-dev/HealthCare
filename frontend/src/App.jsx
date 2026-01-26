@@ -10,7 +10,7 @@ import ProfilePage from './pages/ProfilePage.jsx'
 import Navbar from './components/Navbar.jsx'
 import Appointment from './pages/Appointment.jsx'
 import Footer from './components/Footer.jsx'
-import DesignSystemTest from './pages/DesignSystemTest.jsx'
+
 import ScrollToTop from './components/ScrollToTop.jsx'
 
 
@@ -30,7 +30,7 @@ const App = () => {
       <Route path="/my-appointments" element={<MyAppointmentPage/>}/>
       <Route path="/appointment/:docId" element={<Appointment/>}/>
       <Route path="/profile" element={<ProfilePage/>}/>
-      <Route path="/test" element={<DesignSystemTest />} />
+    
       
      
       </Routes>

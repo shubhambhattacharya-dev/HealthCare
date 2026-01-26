@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { assets } from '../assets/assets_frontend/assets';
 import Button from '../design-system/components/button.jsx';
-import { 
+import {
   CalendarDaysIcon,
   UserGroupIcon,
   ShieldCheckIcon,
@@ -90,8 +90,9 @@ const Banner = () => {
 
   return (
     <section id="banner" className="relative overflow-hidden">
-      {/* Background with gradient */}
+      {/* Background with gradient and overlay for contrast */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary-600 via-primary-700 to-secondary-700" />
+      <div className="absolute inset-0 bg-black/30" />
       
       {/* Animated background elements */}
       <div className="absolute inset-0">
@@ -103,21 +104,14 @@ const Banner = () => {
         
         {/* Floating particles */}
         {[...Array(12)].map((_, i) => (
-          <motion.div
+          <div
             key={i}
             className="absolute w-1 h-1 bg-white/40 rounded-full"
-            initial={{
-              x: (i * 8.33) + 'vw',
-              y: (i * 8.33) + 'vh',
-            }}
-            animate={{
-              y: [null, -15, 0],
-              opacity: [0, 1, 0],
-            }}
-            transition={{
-              duration: 3 + (i * 0.1),
-              repeat: Infinity,
-              delay: i * 0.1,
+            style={{
+              left: `${i * 8.33}vw`,
+              top: `${i * 8.33}vh`,
+              animation: `float 3s ease-in-out infinite`,
+              animationDelay: `${i * 0.1}s`
             }}
           />
         ))}

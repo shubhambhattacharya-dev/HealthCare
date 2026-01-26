@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { assets } from '../assets/assets_frontend/assets';
 import Card from '../design-system/components/Card.jsx';
@@ -377,6 +376,7 @@ const AboutPage = () => {
             variant="accent" 
             className="relative overflow-hidden bg-gradient-to-r from-primary-600 to-secondary-600 text-white"
           >
+            <div className="absolute inset-0 bg-black/20" />
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32" />
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full translate-y-32 -translate-x-32" />
             

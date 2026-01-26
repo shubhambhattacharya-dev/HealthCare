@@ -72,7 +72,7 @@ const DoctorPage = () => {
         </div>
 
         {/* Doctors Grid */}
-        <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 gap-y-6">
+        <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filterDoc.map(item => (
             <Card
               key={item._id}

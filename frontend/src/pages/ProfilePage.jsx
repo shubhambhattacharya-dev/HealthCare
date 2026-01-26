@@ -24,7 +24,20 @@ const ProfilePage = () => {
   const [isEdit, setIsEdit] = useState(false)
 
   return (
-    <div className="max-w-3xl mx-auto mt-12 px-4">
+    <div className="max-w-3xl mx-auto mt-12 px-4 space-y-6">
+      {/* Newsletter Subscription Banner */}
+      <Card className="bg-gradient-to-r from-primary-500 to-primary-600 text-white border-0">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-semibold mb-1">Stay Updated</h3>
+            <p className="text-primary-100 text-sm">Get health tips and appointment reminders</p>
+          </div>
+          <Button variant="secondary" size="sm">
+            Subscribe
+          </Button>
+        </div>
+      </Card>
+
       <Card>
         <div className="flex flex-col sm:flex-row gap-8">
           {/* Profile Image */}
@@ -32,7 +45,7 @@ const ProfilePage = () => {
             <img
               src={userData.image}
               alt="Profile"
-              className="w-32 h-32 rounded-full object-cover bg-indigo-50"
+              className="w-80 h-80 rounded-full object-cover bg-indigo-50"
             />
 
             <Badge variant="success" size="sm">
@@ -193,18 +206,41 @@ const ProfilePage = () => {
             </div>
 
             {/* Actions */}
-            <div className="pt-4">
+            <div className="pt-4 flex gap-3">
               {isEdit ? (
-                <Button onClick={() => setIsEdit(false)}>
-                  Save Changes
-                </Button>
+                <>
+                  <Button onClick={() => setIsEdit(false)} className="ring-2 ring-primary-500 ring-offset-2">
+                    Save Changes
+                  </Button>
+                  <Button variant="outline" onClick={() => setIsEdit(false)}>
+                    Cancel
+                  </Button>
+                </>
               ) : (
-                <Button onClick={() => setIsEdit(true)}>
+                <Button onClick={() => setIsEdit(true)} icon="Edit">
                   Edit Profile
                 </Button>
               )}
             </div>
           </div>
+        </div>
+      </Card>
+
+      {/* Medical Emergency Banner */}
+      <Card className="bg-red-50 border-red-200">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="h-10 w-10 bg-red-100 rounded-full flex items-center justify-center">
+              <span className="text-red-600 text-lg">⚠️</span>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-red-900">Medical Emergency?</h3>
+              <p className="text-red-700 text-sm">Call emergency services immediately if needed</p>
+            </div>
+          </div>
+          <Button variant="danger" size="sm">
+            Call 108
+          </Button>
         </div>
       </Card>
     </div>

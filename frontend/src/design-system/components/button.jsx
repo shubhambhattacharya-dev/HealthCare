@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 
 const Button = ({
   children,
@@ -15,42 +14,80 @@ const Button = ({
   type = 'button',
   ...props
 }) => {
-  // Variant styles
+  // Enhanced variant styles with proper interaction states
   const variantStyles = {
-    primary: 'bg-primary-500 text-white hover:bg-primary-600 shadow-button hover:shadow-button-hover',
-    secondary: 'bg-secondary-500 text-white hover:bg-secondary-600',
-    outline: 'border-2 border-primary-500 text-primary-500 hover:bg-primary-50',
-    ghost: 'text-gray-700 hover:bg-gray-100',
-    success: 'bg-success-500 text-white hover:bg-success-600',
-    warning: 'bg-warning-500 text-white hover:bg-warning-600',
-    error: 'bg-error-500 text-white hover:bg-error-600',
+    primary: `
+      bg-primary-500 text-white
+      hover:bg-primary-600 hover:shadow-lg
+      active:bg-primary-700
+      focus:ring-primary-500
+      shadow-md hover:shadow-lg
+    `,
+    secondary: `
+      bg-secondary-500 text-white
+      hover:bg-secondary-600 hover:shadow-lg
+      active:bg-secondary-700
+      focus:ring-secondary-500
+      shadow-md hover:shadow-lg
+    `,
+    outline: `
+      border-2 border-primary-500 text-primary-600 bg-transparent
+      hover:bg-primary-50 hover:border-primary-600 hover:shadow-md
+      active:bg-primary-100
+      focus:ring-primary-500
+    `,
+    ghost: `
+      text-gray-700 bg-transparent
+      hover:bg-gray-100 hover:shadow-sm
+      active:bg-gray-200
+      focus:ring-gray-500
+    `,
+    success: `
+      bg-success-500 text-white
+      hover:bg-success-600 hover:shadow-lg
+      active:bg-success-700
+      focus:ring-success-500
+      shadow-md hover:shadow-lg
+    `,
+    warning: `
+      bg-warning-500 text-white
+      hover:bg-warning-600 hover:shadow-lg
+      active:bg-warning-700
+      focus:ring-warning-500
+      shadow-md hover:shadow-lg
+    `,
+    error: `
+      bg-error-500 text-white
+      hover:bg-error-600 hover:shadow-lg
+      active:bg-error-700
+      focus:ring-error-500
+      shadow-md hover:shadow-lg
+    `,
   };
 
-  // Size styles
+  // Consistent size styles using spacing system
   const sizeStyles = {
-    xs: 'px-3 py-1.5 text-xs',
-    sm: 'px-4 py-2 text-sm',
-    md: 'px-6 py-3 text-base',
-    lg: 'px-8 py-4 text-lg',
-    xl: 'px-10 py-5 text-xl',
+    xs: 'px-3 py-2 text-sm font-medium',      // 12px x 8px
+    sm: 'px-4 py-2.5 text-sm font-medium',    // 16px x 10px
+    md: 'px-6 py-3 text-base font-semibold',  // 24px x 12px
+    lg: 'px-8 py-4 text-lg font-semibold',    // 32px x 16px
+    xl: 'px-10 py-5 text-xl font-semibold',   // 40px x 20px
   };
 
-  // Base styles
+  // Base styles with enhanced focus and interaction
   const baseStyles = `
     inline-flex items-center justify-center
-    font-semibold rounded-xl
-    transition-all duration-200
+    rounded-xl font-medium
+    transition-all duration-200 ease-out
     focus:outline-none focus:ring-2 focus:ring-offset-2
-    disabled:opacity-50 disabled:cursor-not-allowed
-    active:scale-95
+    disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none
+    active:scale-[0.98]
     ${fullWidth ? 'w-full' : ''}
     ${className}
   `;
 
   return (
-    <motion.button
-      whileTap={{ scale: 0.95 }}
-      whileHover={{ y: -2 }}
+    <button
       type={type}
       disabled={disabled || isLoading}
       className={`
@@ -76,7 +113,7 @@ const Button = ({
           {Icon && iconPosition === 'right' && <Icon className="h-5 w-5" />}
         </div>
       )}
-    </motion.button>
+    </button>
   );
 };
 
