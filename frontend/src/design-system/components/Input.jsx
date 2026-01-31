@@ -5,6 +5,8 @@ const Input = ({
   error,
   helperText,
   icon: Icon,
+  rightIcon: RightIcon,
+  onRightIconClick,
   type = 'text',
   className = '',
   value,
@@ -12,6 +14,7 @@ const Input = ({
   placeholder,
   disabled = false,
   required = false,
+  isLoading = false,
   ...props
 }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -37,7 +40,7 @@ const Input = ({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          disabled={disabled}
+          disabled={disabled || isLoading}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           className={`
@@ -46,7 +49,8 @@ const Input = ({
             focus:outline-none focus:ring-2 focus:ring-offset-2
             disabled:bg-gray-100 disabled:cursor-not-allowed
             placeholder:text-gray-400
-            ${Icon ? 'pl-11 pr-4' : 'px-4'}
+            ${Icon ? 'pl-11' : 'pl-4'}
+            ${RightIcon || isLoading ? 'pr-11' : 'pr-4'}
             py-3
             ${error
               ? 'border-error-500 focus:border-error-500 focus:ring-error-500/20'
@@ -59,15 +63,26 @@ const Input = ({
           {...props}
         />
         
-        {/* Loading indicator for async validation */}
-        {props.isLoading && (
-          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+        {/* Loading indicator or Right Icon */}
+        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+          {isLoading ? (
             <svg className="animate-spin h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
             </svg>
-          </div>
-        )}
+          ) : (
+            RightIcon && (
+              <button
+                type="button"
+                onClick={onRightIconClick}
+                className="text-gray-400 hover:text-gray-600"
+                disabled={disabled}
+              >
+                <RightIcon className="h-5 w-5" />
+              </button>
+            )
+          )}
+        </div>
       </div>
       
       {error && (

@@ -9,8 +9,7 @@ import {
   Award,
   ChevronRight,
   Calendar,
-  Shield,
-  CheckCircle
+  Shield
 } from 'lucide-react'
 
 // Context
@@ -56,6 +55,22 @@ const TopDoctors = () => {
   const getPatientCount = (doctor) => {
     if (doctor.patientCount) return doctor.patientCount
     return 500 + (doctor.id % 500) // Fallback: 500-1000
+  }
+
+  const getDoctorRating = (doctor) => {
+    return doctor.rating || '4.8'
+  }
+
+  const getDoctorReviews = (doctor) => {
+    return doctor.reviews || '200+'
+  }
+
+  const getDoctorLocation = (doctor) => {
+    return doctor.location || 'Apollo Hospital, Delhi'
+  }
+
+  const getDoctorFee = (doctor) => {
+    return doctor.fee || '500'
   }
 
   const handleDoctorClick = (doctorId) => {
@@ -169,11 +184,11 @@ const TopDoctors = () => {
                           <div className="flex items-center">
                             <Star className="h-4 w-4 text-yellow-400 fill-current" />
                             <span className="ml-1 font-semibold text-gray-900">
-                              {doctor.rating || '4.8'}
+                              {getDoctorRating(doctor)}
                             </span>
                           </div>
                           <span className="text-sm text-gray-500">
-                            ({doctor.reviews || '200+'} reviews)
+                            ({getDoctorReviews(doctor)} reviews)
                           </span>
                         </div>
                         
@@ -187,7 +202,7 @@ const TopDoctors = () => {
                       <div className="flex items-center text-sm text-gray-600">
                         <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
                         <span className="truncate">
-                          {doctor.location || 'Apollo Hospital, Delhi'}
+                          {getDoctorLocation(doctor)}
                         </span>
                       </div>
 
@@ -196,7 +211,7 @@ const TopDoctors = () => {
                         <div>
                           <p className="text-sm text-gray-500">Consultation Fee</p>
                           <p className="text-2xl font-bold text-gray-900">
-                            ₹{doctor.fee || '500'}
+                            ₹{getDoctorFee(doctor)}
                             <span className="text-sm text-gray-500 font-normal"> / visit</span>
                           </p>
                         </div>

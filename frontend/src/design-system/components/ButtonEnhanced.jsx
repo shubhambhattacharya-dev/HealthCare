@@ -1,4 +1,5 @@
 import React from 'react';
+import { Calendar, Phone, Plus, ArrowRight } from 'lucide-react';
 
 /**
  * ButtonEnhanced Component - Advanced button with loading states and accessibility
@@ -184,7 +185,7 @@ export const ButtonVariants = {
   BookAppointment: (props) => (
     <ButtonEnhanced
       variant="primary"
-      icon="Calendar"
+      icon={Calendar}
       iconPosition="left"
       {...props}
     >
@@ -195,7 +196,7 @@ export const ButtonVariants = {
   ContactDoctor: (props) => (
     <ButtonEnhanced
       variant="outline"
-      icon="Phone"
+      icon={Phone}
       iconPosition="left"
       {...props}
     >
@@ -246,10 +247,10 @@ export const ButtonExamples = () => (
     <div className="space-y-3">
       <h4 className="font-medium">With Icons</h4>
       <div className="flex flex-wrap gap-3">
-        <ButtonEnhanced variant="primary" icon="Plus" iconPosition="left">
+        <ButtonEnhanced variant="primary" icon={Plus} iconPosition="left">
           Add Item
         </ButtonEnhanced>
-        <ButtonEnhanced variant="outline" icon="ArrowRight" iconPosition="right">
+        <ButtonEnhanced variant="outline" icon={ArrowRight} iconPosition="right">
           Continue
         </ButtonEnhanced>
       </div>

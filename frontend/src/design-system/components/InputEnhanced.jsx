@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, CheckCircle, AlertCircle, Mail, Lock, Phone, Search, Loader } from 'lucide-react';
 
 /**
  * InputEnhanced Component - Advanced form input with validation feedback
@@ -182,7 +182,7 @@ export const InputVariants = {
       type="email"
       label="Email Address"
       placeholder="Enter your email"
-      icon="Mail"
+      icon={Mail}
       {...props}
     />
   ),
@@ -193,7 +193,7 @@ export const InputVariants = {
       label="Password"
       placeholder="Enter your password"
       showPasswordToggle
-      icon="Lock"
+      icon={Lock}
       {...props}
     />
   ),
@@ -203,7 +203,7 @@ export const InputVariants = {
       type="tel"
       label="Phone Number"
       placeholder="Enter your phone number"
-      icon="Phone"
+      icon={Phone}
       {...props}
     />
   ),
@@ -212,7 +212,7 @@ export const InputVariants = {
     <InputEnhanced
       type="search"
       placeholder="Search doctors, specialties..."
-      icon="Search"
+      icon={Search}
       {...props}
     />
   )
@@ -240,7 +240,7 @@ export const InputExamples = () => (
         label="Email Address"
         type="email"
         placeholder="Enter your email"
-        icon="Mail"
+        icon={Mail}
       />
     </div>
 
@@ -252,7 +252,7 @@ export const InputExamples = () => (
         type="email"
         placeholder="Enter your email"
         error="Please enter a valid email address"
-        icon="Mail"
+        icon={Mail}
       />
     </div>
 
@@ -264,7 +264,7 @@ export const InputExamples = () => (
         type="email"
         placeholder="Enter your email"
         success="Email address is available"
-        icon="Mail"
+        icon={Mail}
       />
     </div>
 
@@ -276,7 +276,7 @@ export const InputExamples = () => (
         type="password"
         placeholder="Enter your password"
         showPasswordToggle
-        icon="Lock"
+        icon={Lock}
         helperText="Must be at least 8 characters"
       />
     </div>
@@ -288,7 +288,7 @@ export const InputExamples = () => (
         label="Verifying..."
         placeholder="Checking availability..."
         isLoading
-        icon="Loader"
+        icon={Loader}
       />
     </div>
   </div>

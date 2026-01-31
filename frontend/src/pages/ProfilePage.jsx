@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { assets } from '../assets/assets_frontend/assets'
+import { PencilIcon } from '@heroicons/react/24/outline'
 
 // design-system
 import Card from '../design-system/components/Card.jsx'
@@ -217,7 +218,7 @@ const ProfilePage = () => {
                   </Button>
                 </>
               ) : (
-                <Button onClick={() => setIsEdit(true)} icon="Edit">
+                <Button onClick={() => setIsEdit(true)} icon={PencilIcon}>
                   Edit Profile
                 </Button>
               )}
