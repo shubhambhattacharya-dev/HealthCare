@@ -1,4 +1,4 @@
-import { Inter } from "next/font/google";
+import { Flavors, Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "../components/ui/themeProvider";
 import Headers from "../components/header";
@@ -11,8 +11,12 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "MediMeet-Doctor Appointment Booking App",
-  description: "Connect with doctors anutime,anywhere with MediMeet",
+  title: "DocNow - Book a Doctor Instantly",
+  description:
+    "Book doctor appointments, consult via video, and manage your healthcare journey anytime, anywhere with DocNow.",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({ children }) {
