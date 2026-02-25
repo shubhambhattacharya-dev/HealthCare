@@ -5,10 +5,51 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../lib/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String   @id @default(uuid())
+  clerkUserId     String   @unique
+  email           String   @unique
+  name            String?
+  imageUrl        String?
+  role            UserRole @default(UNASSIGNED)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // patient-specific field
+  credits         Int @default(2)
+
+  // doctor-specific field
+  speciality          String?
+  experience          Int?
+  credentialURL       String?
+  description         String? @db.Text
+  verificationStatus  VerificationStatus? @default(PENDING)
+
+  // relations
+  patientAppointmentsc Appointment[] @relation("patientAppointments")
+  doctorAppointments   Appointment[] @relation("doctorAppointments")
+  availabilities       Availability[]
+  transactions         CreditTransaction[]
+}
+
+enum UserRole {
+  UNASSIGNED
+  PATIENT
+  DOCTOR
+  ADMIN
+}
+
+enum VerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
