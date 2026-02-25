@@ -11,7 +11,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -34,11 +33,11 @@ model User {
   description         String? @db.Text
   verificationStatus  VerificationStatus? @default(PENDING)
 
-  // relations
-  patientAppointmentsc Appointment[] @relation("patientAppointments")
-  doctorAppointments   Appointment[] @relation("doctorAppointments")
-  availabilities       Availability[]
-  transactions         CreditTransaction[]
+  // relations (FIXED relation names)
+  patientAppointments Appointment[] @relation("PatientAppointments")
+  doctorAppointments  Appointment[] @relation("DoctorAppointments")
+  availabilities      Availability[]
+  transactions        CreditTransaction[]
 }
 
 enum UserRole {
@@ -53,3 +52,77 @@ enum VerificationStatus {
   APPROVED
   REJECTED
 }
+
+model Availability {
+  id        String   @id @default(uuid())
+  doctorId  String
+  doctor    User     @relation(fields: [doctorId], references: [id])
+  startTime String
+  endTime   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  status SloteStatus @default(AVAILABLE)
+
+  @@index([doctorId, startTime])
+}
+
+enum SloteStatus {
+  AVAILABLE
+  BOOKED
+  BLOCKED
+}
+
+model Appointment {
+  id         String  @id @default(uuid())
+  patientId  String
+  patient    User   @relation("PatientAppointments", fields: [patientId], references: [id])
+
+  doctorId   String
+  doctor     User   @relation("DoctorAppointments", fields: [doctorId], references: [id])
+
+  startTime  DateTime
+  endTime    DateTime
+  status     AppointmentStatus @default(SCHEDULED)
+  notes      String? @db.Text
+  patientDescription String? @db.Text
+
+  // video session fields
+  videoSessionId    String?
+  videoSessionToken String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // FIXED index casing
+  @@index([status, startTime])
+  @@index([doctorId, startTime])
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CANCELLED
+  COMPLETED
+}
+
+model CreditTransaction {
+  id        String  @id @default(uuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  amount    Int
+  type      TransactionType
+  packageId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum TransactionType {
+  CREDIT_PURCHASE
+  APPOINTMENT_DEDUCTION
+  ADMIN_ADJUSTMENT
+}
+
+
+
