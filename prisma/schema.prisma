@@ -11,6 +11,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -20,24 +21,29 @@ model User {
   name            String?
   imageUrl        String?
   role            UserRole @default(UNASSIGNED)
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  deletedAt       DateTime?
 
-  // patient-specific field
+  // Patient field
   credits         Int @default(2)
 
-  // doctor-specific field
+  // Doctor fields
   speciality          String?
   experience          Int?
   credentialURL       String?
   description         String? @db.Text
-  verificationStatus  VerificationStatus? @default(PENDING)
+  verificationStatus  VerificationStatus @default(PENDING)
 
-  // relations (FIXED relation names)
+  // Relations
   patientAppointments Appointment[] @relation("PatientAppointments")
   doctorAppointments  Appointment[] @relation("DoctorAppointments")
   availabilities      Availability[]
   transactions        CreditTransaction[]
+
+  @@index([role])
+  @@index([verificationStatus])
 }
 
 enum UserRole {
@@ -55,48 +61,59 @@ enum VerificationStatus {
 
 model Availability {
   id        String   @id @default(uuid())
+
   doctorId  String
-  doctor    User     @relation(fields: [doctorId], references: [id])
-  startTime String
-  endTime   String
+  doctor    User     @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  startTime DateTime
+  endTime   DateTime
+
+  status    SlotStatus @default(AVAILABLE)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  status SloteStatus @default(AVAILABLE)
-
   @@index([doctorId, startTime])
+  @@index([status])
 }
 
-enum SloteStatus {
+enum SlotStatus {
   AVAILABLE
   BOOKED
   BLOCKED
 }
 
 model Appointment {
-  id         String  @id @default(uuid())
+  id         String   @id @default(uuid())
+
   patientId  String
-  patient    User   @relation("PatientAppointments", fields: [patientId], references: [id])
+  patient    User     @relation("PatientAppointments", fields: [patientId], references: [id], onDelete: Cascade)
 
   doctorId   String
-  doctor     User   @relation("DoctorAppointments", fields: [doctorId], references: [id])
+  doctor     User     @relation("DoctorAppointments", fields: [doctorId], references: [id], onDelete: Cascade)
 
   startTime  DateTime
   endTime    DateTime
+
   status     AppointmentStatus @default(SCHEDULED)
-  notes      String? @db.Text
-  patientDescription String? @db.Text
 
-  // video session fields
-  videoSessionId    String?
-  videoSessionToken String?
+  notes               String? @db.Text
+  patientDescription  String? @db.Text
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  // Video session fields
+  videoSessionId      String?
+  videoSessionToken   String?
 
-  // FIXED index casing
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  // Prevent double booking for same doctor same slot
+  @@unique([doctorId, startTime])
+
   @@index([status, startTime])
   @@index([doctorId, startTime])
+  @@index([patientId, startTime])
 }
 
 enum AppointmentStatus {
@@ -106,9 +123,10 @@ enum AppointmentStatus {
 }
 
 model CreditTransaction {
-  id        String  @id @default(uuid())
+  id        String   @id @default(uuid())
+
   userId    String
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   amount    Int
   type      TransactionType
@@ -116,6 +134,8 @@ model CreditTransaction {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([userId, createdAt])
 }
 
 enum TransactionType {
@@ -123,6 +143,5 @@ enum TransactionType {
   APPOINTMENT_DEDUCTION
   ADMIN_ADJUSTMENT
 }
-
 
 
