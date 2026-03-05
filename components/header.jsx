@@ -12,11 +12,16 @@ import {
 import { Button } from './ui/button'
 import { checkUser } from '@/lib/checkUser'
 import { Calendar, ShieldCheck, Stethoscope, User } from 'lucide-react'
+import { checkAndAllocateCredits } from '../actions/credits'
 
 
 const Header = async() => {
 
 const user =await checkUser();
+
+if(user?.role==="PATIENT"){
+  await checkAndAllocateCredits(user);
+}
 
 
   return (
