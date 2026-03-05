@@ -1,6 +1,7 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
 generator client {
   provider = "prisma-client-js"
-  output   = "../lib/generated/prisma"
 }
 
 datasource db {
@@ -8,34 +9,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-//////////////////////
-// USER
-//////////////////////
-
 model User {
-  id          String   @id @default(uuid())
-  clerkUserId String   @unique
-  email       String   @unique
-  name        String?
-  imageUrl    String?
+  id                String    @id @default(uuid())
+  clerkUserId       String    @unique
+  email             String    @unique
+  name              String?
+  imageUrl          String?
 
-  role        UserRole @default(UNASSIGNED)
+  role              UserRole  @default(UNASSIGNED)
 
-  // Current usable credits (fast lookup)
-  credits     Int      @default(0)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  deletedAt   DateTime?
+  // Patient
+  credits           Int       @default(2)
+
+  // Doctor
+  specialty         String?
+  experience        Int?
+  credentialUrl     String?
+  description       String?   @db.Text
+  verificationStatus VerificationStatus? @default(PENDING)
 
   // Relations
-  subscription        Subscription?
-  creditTransactions  CreditTransaction[]
   patientAppointments Appointment[] @relation("PatientAppointments")
   doctorAppointments  Appointment[] @relation("DoctorAppointments")
   availabilities      Availability[]
-
-  @@index([role])
+  transactions        CreditTransaction[]
+  payouts             Payout[]
 }
 
 enum UserRole {
@@ -45,55 +46,66 @@ enum UserRole {
   ADMIN
 }
 
-//////////////////////
-// SUBSCRIPTION
-//////////////////////
-
-model Subscription {
-  id                 String   @id @default(uuid())
-
-  userId             String   @unique
-  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  plan               SubscriptionPlan
-  status             SubscriptionStatus @default(INACTIVE)
-
-  currentPeriodStart DateTime?
-  currentPeriodEnd   DateTime?
-
-  cancelAtPeriodEnd  Boolean  @default(false)
-
-  provider           PaymentProvider
-  providerSubId      String?   // Stripe / Razorpay subscription id
-
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-
-  @@index([status])
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
 }
 
-enum SubscriptionPlan {
-  FREE
-  BASIC
-  PRO
+model Availability {
+  id        String   @id @default(uuid())
+  doctorId  String
+  doctor    User     @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  startTime DateTime
+  endTime   DateTime
+  status    SlotStatus @default(AVAILABLE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([doctorId, startTime])
+  @@unique([doctorId, startTime])
 }
 
-enum SubscriptionStatus {
-  ACTIVE
-  INACTIVE
+enum SlotStatus {
+  AVAILABLE
+  BOOKED
+  BLOCKED
+}
+
+model Appointment {
+  id                String   @id @default(uuid())
+
+  patientId         String
+  patient           User     @relation("PatientAppointments", fields: [patientId], references: [id])
+
+  doctorId          String
+  doctor            User     @relation("DoctorAppointments", fields: [doctorId], references: [id])
+
+  startTime         DateTime
+  endTime           DateTime
+
+  status            AppointmentStatus @default(SCHEDULED)
+
+  notes             String? @db.Text
+  patientDescription String? @db.Text
+
+  videoSessionId    String?
+  videoSessionToken String?
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([status, startTime])
+  @@index([doctorId, startTime])
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  COMPLETED
   CANCELLED
-  PAST_DUE
 }
-
-enum PaymentProvider {
-  CLERK
-  STRIPE
-  RAZORPAY
-}
-
-//////////////////////
-// CREDIT TRANSACTION
-//////////////////////
 
 model CreditTransaction {
   id        String   @id @default(uuid())
@@ -103,7 +115,7 @@ model CreditTransaction {
 
   amount    Int
   type      TransactionType
-  note      String?
+  packageId String?
 
   createdAt DateTime @default(now())
 
@@ -111,69 +123,36 @@ model CreditTransaction {
 }
 
 enum TransactionType {
-  SUBSCRIPTION_GRANT
-  SUBSCRIPTION_RENEWAL
+  CREDIT_PURCHASE
   APPOINTMENT_DEDUCTION
   ADMIN_ADJUSTMENT
-  REFUND
 }
 
-//////////////////////
-// APPOINTMENTS
-//////////////////////
+model Payout {
+  id              String   @id @default(uuid())
 
-model Appointment {
-  id        String   @id @default(uuid())
+  doctorId        String
+  doctor          User     @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 
-  patientId String
-  patient   User     @relation("PatientAppointments", fields: [patientId], references: [id], onDelete: Cascade)
+  amount          Decimal  @db.Decimal(10,2)
+  credits         Int
+  platformFee     Decimal  @db.Decimal(10,2)
+  netAmount       Decimal  @db.Decimal(10,2)
 
-  doctorId  String
-  doctor    User     @relation("DoctorAppointments", fields: [doctorId], references: [id], onDelete: Cascade)
+  paypalEmail     String
 
-  startTime DateTime
-  endTime   DateTime
+  status          PayoutStatus @default(PROCESSING)
 
-  status    AppointmentStatus @default(SCHEDULED)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  processedAt     DateTime?
+  processedBy     String?
 
-  notes     String? @db.Text
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([doctorId, startTime])
-  @@index([status, startTime])
+  @@index([status, createdAt])
+  @@index([doctorId, status])
 }
 
-enum AppointmentStatus {
-  SCHEDULED
-  CANCELLED
-  COMPLETED
-}
-
-//////////////////////
-// DOCTOR AVAILABILITY
-//////////////////////
-
-model Availability {
-  id        String   @id @default(uuid())
-
-  doctorId  String
-  doctor    User     @relation(fields: [doctorId], references: [id], onDelete: Cascade)
-
-  startTime DateTime
-  endTime   DateTime
-
-  status    SlotStatus @default(AVAILABLE)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([doctorId, startTime])
-}
-
-enum SlotStatus {
-  AVAILABLE
-  BOOKED
-  BLOCKED
+enum PayoutStatus {
+  PROCESSING
+  PROCESSED
 }

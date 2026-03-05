@@ -8,15 +8,13 @@ import {
 } from "@/components/ui/card";
 import {
   ArrowRight,
-  Check,
-  Stethoscope,
   ShieldCheck,
   Clock,
   Video,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { creditBenefits, features, testimonials } from "@/lib/data";
+import { features } from "@/lib/data";
 import Pricing from "@/components/pricing";
 
 export default function Home() {
@@ -36,7 +34,7 @@ export default function Home() {
                 variant="outline"
                 className="bg-emerald-500/10 border-emerald-500/30 text-emerald-400 px-4 py-2 text-sm font-medium backdrop-blur-sm"
               >
-                🩺 India's Fastest Doctor Booking Platform
+                🩺 India&apos;s Fastest Doctor Booking Platform
               </Badge>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-foreground">

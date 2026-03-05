@@ -1,4 +1,4 @@
-import { Flavors, Inter } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "../components/ui/themeProvider";
 import Headers from "../components/header";

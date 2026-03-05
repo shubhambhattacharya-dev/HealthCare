@@ -1,52 +1,140 @@
-//server action 
+"use server";
 
-"use server"
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
+import { revalidatePath } from "next/cache";
+import { format } from "date-fns";
+import { db } from "@/lib/prisma";
 
-//define credit transaction
-
-const PLAN_CREDITSc={
-    free_user:0,
-    standard:10,
-    pro:24
+// credits per plan
+const PLAN_CREDITS = {
+free_user: 2,
+basic: 5,
+standard: 10,
+pro: 24,
 };
 
-//each apportiment cost 2 credits
-const APPOINTMENT_COST=2;
-
-export async function checkAndAllocateCredits(userId){
-    try {
-        //check user is logged in and is patient 
-        if(!userId){
-            return {sucess:false,message:"User not logged"}
-        }
-        //patient or not 
-
-        if(userId.role !== "PATIENT"){
-            return {sucess:false,message:"Only patients can purchase credits"}
-        }
-
-        //what plan user has
+export async function checkAndAllocateCredits() {
+try {
+const { userId } = await auth();
+const user = await currentUser();
 
 
-        const {has}=await auth();
-        const hasBasic=has({plan:"basic"});
-        const hasStandard=has({plan:"standard"});
-        const hasPro=has({plan:"pro"});
-
-        //cuurent plan 
-
-        let currentPlan=null;
-        let creditsToAllocate=0;
-
-        if(hasPro){
-            currentPlan="pro";
-            creditsToAllocate=PLAN_CREDITSc.pro;
-        }
-
-    } catch (error) {
-        
-    }
-
+if (!userId || !user) {
+  return { success: false, message: "User not logged in" };
 }
 
+// Fetch user
+const dbUser = await db.user.findUnique({
+  where: { clerkUserId: userId },
+  include: {
+    subscription: true,
+    creditTransactions: {
+      orderBy: { createdAt: "desc" },
+      take: 50,
+    },
+  },
+});
+
+if (!dbUser) {
+  return { success: false, message: "User not found" };
+}
+
+if (dbUser.role !== "PATIENT") {
+  return { success: false, message: "Only patients receive credits" };
+}
+
+// determine plan
+let currentPlan = "free_user";
+let creditsForPlan = PLAN_CREDITS.free_user;
+
+const subscription = dbUser.subscription;
+
+if (subscription && subscription.status === "ACTIVE") {
+  if (subscription.plan === "PRO") {
+    currentPlan = "pro";
+    creditsForPlan = PLAN_CREDITS.pro;
+  } 
+  else if (subscription.plan === "STANDARD") {
+    currentPlan = "standard";
+    creditsForPlan = PLAN_CREDITS.standard;
+  } 
+  else if (subscription.plan === "BASIC") {
+    currentPlan = "basic";
+    creditsForPlan = PLAN_CREDITS.basic;
+  }
+}
+
+// calculate difference
+const creditsNeeded = creditsForPlan - dbUser.credits;
+
+if (creditsNeeded <= 0) {
+  return {
+    success: true,
+    message: "Credits already up to date",
+    credits: dbUser.credits,
+  };
+}
+
+const currentMonth = format(new Date(), "MM-yyyy");
+
+const existingTransaction = dbUser.creditTransactions?.find((t) => {
+  const transactionMonth = format(t.createdAt, "MM-yyyy");
+  return (
+    transactionMonth === currentMonth &&
+    t.packageId === currentPlan
+  );
+});
+
+if (existingTransaction) {
+  return {
+    success: true,
+    message: "Credits already allocated this month",
+    credits: dbUser.credits,
+  };
+}
+
+// allocate credits
+const updatedUser = await db.$transaction(async (tx) => {
+
+  await tx.creditTransaction.create({
+    data: {
+      userId: dbUser.id,
+      type: "SUBSCRIPTION_GRANT",
+      packageId: currentPlan,
+      amount: creditsNeeded,
+    },
+  });
+
+  return await tx.user.update({
+    where: { id: dbUser.id },
+    data: {
+      credits: {
+        increment: creditsNeeded,
+      },
+    },
+  });
+
+});
+
+revalidatePath("/");
+revalidatePath("/doctors");
+revalidatePath("/appointments");
+
+return {
+  success: true,
+  message: "Credits allocated successfully",
+  credits: updatedUser.credits,
+};
+
+
+} catch (error) {
+console.error("Credit allocation error:", error);
+
+
+return {
+  success: false,
+  message: "Error allocating credits",
+};
+
+}
+}

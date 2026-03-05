@@ -2,9 +2,7 @@ import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
-  SignIn,
   SignInButton,
-  SignUpButton,
   SignedIn,
   SignedOut,
   UserButton,
@@ -19,10 +17,12 @@ import { checkAndAllocateCredits } from '../actions/credits'
 
 const Header = async () => {
 
-  const user = await checkUser();
+  let user = await checkUser();
 
+  // Initialize credits for patient users if not already done
   if (user?.role === "PATIENT") {
-    await checkAndAllocateCredits(user);
+    await checkAndAllocateCredits(user.id);
+    user = await checkUser(); // refetch updated credits
   }
 
   return (
