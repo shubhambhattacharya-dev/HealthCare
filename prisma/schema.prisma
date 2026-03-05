@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../lib/generated/prisma"
@@ -14,36 +8,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+//////////////////////
+// USER
+//////////////////////
+
 model User {
-  id              String   @id @default(uuid())
-  clerkUserId     String   @unique
-  email           String   @unique
-  name            String?
-  imageUrl        String?
-  role            UserRole @default(UNASSIGNED)
+  id          String   @id @default(uuid())
+  clerkUserId String   @unique
+  email       String   @unique
+  name        String?
+  imageUrl    String?
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  deletedAt       DateTime?
+  role        UserRole @default(UNASSIGNED)
 
-  // Patient field
-  credits         Int @default(2)
+  // Current usable credits (fast lookup)
+  credits     Int      @default(0)
 
-  // Doctor fields
-  speciality          String?
-  experience          Int?
-  credentialURL       String?
-  description         String? @db.Text
-  verificationStatus  VerificationStatus @default(PENDING)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
 
   // Relations
+  subscription        Subscription?
+  creditTransactions  CreditTransaction[]
   patientAppointments Appointment[] @relation("PatientAppointments")
   doctorAppointments  Appointment[] @relation("DoctorAppointments")
   availabilities      Availability[]
-  transactions        CreditTransaction[]
 
   @@index([role])
-  @@index([verificationStatus])
 }
 
 enum UserRole {
@@ -53,11 +45,115 @@ enum UserRole {
   ADMIN
 }
 
-enum VerificationStatus {
-  PENDING
-  APPROVED
-  REJECTED
+//////////////////////
+// SUBSCRIPTION
+//////////////////////
+
+model Subscription {
+  id                 String   @id @default(uuid())
+
+  userId             String   @unique
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  plan               SubscriptionPlan
+  status             SubscriptionStatus @default(INACTIVE)
+
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+
+  cancelAtPeriodEnd  Boolean  @default(false)
+
+  provider           PaymentProvider
+  providerSubId      String?   // Stripe / Razorpay subscription id
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([status])
 }
+
+enum SubscriptionPlan {
+  FREE
+  BASIC
+  PRO
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+  CANCELLED
+  PAST_DUE
+}
+
+enum PaymentProvider {
+  CLERK
+  STRIPE
+  RAZORPAY
+}
+
+//////////////////////
+// CREDIT TRANSACTION
+//////////////////////
+
+model CreditTransaction {
+  id        String   @id @default(uuid())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  amount    Int
+  type      TransactionType
+  note      String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+enum TransactionType {
+  SUBSCRIPTION_GRANT
+  SUBSCRIPTION_RENEWAL
+  APPOINTMENT_DEDUCTION
+  ADMIN_ADJUSTMENT
+  REFUND
+}
+
+//////////////////////
+// APPOINTMENTS
+//////////////////////
+
+model Appointment {
+  id        String   @id @default(uuid())
+
+  patientId String
+  patient   User     @relation("PatientAppointments", fields: [patientId], references: [id], onDelete: Cascade)
+
+  doctorId  String
+  doctor    User     @relation("DoctorAppointments", fields: [doctorId], references: [id], onDelete: Cascade)
+
+  startTime DateTime
+  endTime   DateTime
+
+  status    AppointmentStatus @default(SCHEDULED)
+
+  notes     String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([doctorId, startTime])
+  @@index([status, startTime])
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CANCELLED
+  COMPLETED
+}
+
+//////////////////////
+// DOCTOR AVAILABILITY
+//////////////////////
 
 model Availability {
   id        String   @id @default(uuid())
@@ -74,7 +170,6 @@ model Availability {
   updatedAt DateTime @updatedAt
 
   @@index([doctorId, startTime])
-  @@index([status])
 }
 
 enum SlotStatus {
@@ -82,66 +177,3 @@ enum SlotStatus {
   BOOKED
   BLOCKED
 }
-
-model Appointment {
-  id         String   @id @default(uuid())
-
-  patientId  String
-  patient    User     @relation("PatientAppointments", fields: [patientId], references: [id], onDelete: Cascade)
-
-  doctorId   String
-  doctor     User     @relation("DoctorAppointments", fields: [doctorId], references: [id], onDelete: Cascade)
-
-  startTime  DateTime
-  endTime    DateTime
-
-  status     AppointmentStatus @default(SCHEDULED)
-
-  notes               String? @db.Text
-  patientDescription  String? @db.Text
-
-  // Video session fields
-  videoSessionId      String?
-  videoSessionToken   String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime?
-
-  // Prevent double booking for same doctor same slot
-  @@unique([doctorId, startTime])
-
-  @@index([status, startTime])
-  @@index([doctorId, startTime])
-  @@index([patientId, startTime])
-}
-
-enum AppointmentStatus {
-  SCHEDULED
-  CANCELLED
-  COMPLETED
-}
-
-model CreditTransaction {
-  id        String   @id @default(uuid())
-
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  amount    Int
-  type      TransactionType
-  packageId String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([userId, createdAt])
-}
-
-enum TransactionType {
-  CREDIT_PURCHASE
-  APPOINTMENT_DEDUCTION
-  ADMIN_ADJUSTMENT
-}
-
-
