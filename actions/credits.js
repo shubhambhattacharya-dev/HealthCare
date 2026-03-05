@@ -27,7 +27,6 @@ if (!userId || !user) {
 const dbUser = await db.user.findUnique({
   where: { clerkUserId: userId },
   include: {
-    subscription: true,
     creditTransactions: {
       orderBy: { createdAt: "desc" },
       take: 50,
@@ -43,26 +42,10 @@ if (dbUser.role !== "PATIENT") {
   return { success: false, message: "Only patients receive credits" };
 }
 
-// determine plan
+// determine plan - default to free_user credits
+// Subscription logic can be added later when Subscription model is created
 let currentPlan = "free_user";
 let creditsForPlan = PLAN_CREDITS.free_user;
-
-const subscription = dbUser.subscription;
-
-if (subscription && subscription.status === "ACTIVE") {
-  if (subscription.plan === "PRO") {
-    currentPlan = "pro";
-    creditsForPlan = PLAN_CREDITS.pro;
-  } 
-  else if (subscription.plan === "STANDARD") {
-    currentPlan = "standard";
-    creditsForPlan = PLAN_CREDITS.standard;
-  } 
-  else if (subscription.plan === "BASIC") {
-    currentPlan = "basic";
-    creditsForPlan = PLAN_CREDITS.basic;
-  }
-}
 
 // calculate difference
 const creditsNeeded = creditsForPlan - dbUser.credits;
