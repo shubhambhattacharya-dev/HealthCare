@@ -143,7 +143,7 @@ const Header = async () => {
                       <span className="hidden md:inline">Credits</span>
                     </>
                   ) : (
-                    <>Pricing</>
+                    <>pricing</>
                   )}
                 </span>
               </Badge>
