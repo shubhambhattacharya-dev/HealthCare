@@ -1,0 +1,105 @@
+"use client"
+
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from "zod";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { User, Stethoscope } from 'lucide-react';
+
+const doctorFormSchema = z.object({
+  speciality: z.string().min(1, "speciality required"),
+  experience: z.number()
+    .min(1, "experience must be at least 1 year")
+    .max(70, "Experience must be less than 70 years"),
+  credentialUrl: z.string()
+    .url("please enter a valid url")
+    .min(1, "credential url is required"),
+  description: z.string()
+    .min(20, "description must be at least 20 characters")
+    .max(1000, "description must be less than 1000 characters"),
+});
+
+const OnboardingPage = () => {
+
+  const [step, setstep] = useState("choose-role");
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    watch
+  } = useForm({
+    resolver: zodResolver(doctorFormSchema),
+    defaultValues: {
+      speciality: "",
+      experience: undefined,
+      credentialUrl: "",
+      description: "",
+    }
+  });
+
+  const specialityValue = watch("speciality");
+
+  // step 1: choose the role
+  if (step === "choose-role") {
+    return (
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+
+        {/* Patient Card */}
+        <Card
+          onClick={() => setstep("patient")}
+          className="border border-emerald-900/20 hover:border-emerald-600/50 cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-lg hover:shadow-emerald-900/20 bg-card"
+        >
+          <CardContent className="pt-8 pb-8 flex flex-col items-center text-center">
+            <div className='p-4 bg-emerald-900/20 rounded-full mb-4 ring-1 ring-emerald-700/30'>
+              <User className="h-8 w-8 text-emerald-400" />
+            </div>
+            <CardTitle className="text-xl font-semibold text-foreground mb-3">
+              I&apos;m a Patient
+            </CardTitle>
+            <CardDescription className="mb-6 text-sm leading-relaxed">
+              Search verified doctors, book appointments instantly, and manage your entire healthcare journey — all in one place.
+            </CardDescription>
+            <Button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium">
+              Get Started as Patient
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Doctor Card */}
+        <Card
+          onClick={() => setstep("doctor-form")}
+          className="border border-emerald-900/20 hover:border-emerald-600/50 cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-lg hover:shadow-emerald-900/20 bg-card"
+        >
+          <CardContent className="pt-8 pb-8 flex flex-col items-center text-center">
+            <div className='p-4 bg-emerald-900/20 rounded-full mb-4 ring-1 ring-emerald-700/30'>
+              <Stethoscope className="h-8 w-8 text-emerald-400" />
+            </div>
+            <CardTitle className="text-xl font-semibold text-foreground mb-3">
+              I&apos;m a Doctor
+            </CardTitle>
+            <CardDescription className="mb-6 text-sm leading-relaxed">
+              Build your professional profile, set your availability, and connect with patients seeking your expertise.
+            </CardDescription>
+            <Button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium">
+              Apply as a Doctor
+            </Button>
+          </CardContent>
+        </Card>
+
+      </div>
+    );
+  }
+
+  // step 2: doctor form
+  if (step === "doctor-form") {
+    return <>doctor form</>
+  }
+
+  return null;
+}
+
+export default OnboardingPage

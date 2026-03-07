@@ -1,10 +1,13 @@
 "use server";
 
-import { auth } from "@clerk/nextjs";
-import { VerificationStatus } from "@prisma/client";
 import { db } from "@/lib/prisma";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
+import { VerificationStatus } from "@prisma/client";
 
+/**
+ * Sets the user's role and related information
+ */
 export async function setUserRole(formData) {
   const { userId } = await auth();
 
@@ -12,64 +15,138 @@ export async function setUserRole(formData) {
     throw new Error("Unauthorized");
   }
 
-  // find user in our database
+  // Find user in database
   const user = await db.user.findUnique({
     where: { clerkUserId: userId },
   });
 
-  if (!user) throw new Error("User not found in database");
+  if (!user) {
+    throw new Error("User not found in database");
+  }
 
-  // role
+  // Prevent role overwrite after onboarding
+  if (user.role && user.role !== "UNASSIGNED") {
+    throw new Error("User role already set");
+  }
+
   const role = formData.get("role");
 
-  if (!role || !["patient", "doctor"].includes(role)) {
-    throw new Error("Invalid role selected");
+  if (!role || !["PATIENT", "DOCTOR"].includes(role)) {
+    throw new Error("Invalid role selection");
   }
 
   try {
-    if (role === "patient") {
-      await db.user.update({
-        where: {
-          clerkUserId: userId,
-        },
-        data: {
+    // PATIENT FLOW
+    if (role === "PATIENT") {
+      // Get user email from Clerk
+      const { userId } = await auth();
+      const clerkUser = await currentUser();
+      const primaryEmail = clerkUser?.emailAddresses?.find(
+        (e) => e.id === clerkUser.primaryEmailAddressId
+      )?.emailAddress;
+      
+      await db.user.upsert({
+        where: { clerkUserId: userId },
+        update: {
           role: "PATIENT",
+        },
+        create: {
+          clerkUserId: userId,
+          email: primaryEmail || "",
+          name: [clerkUser?.firstName, clerkUser?.lastName].filter(Boolean).join(" ") || "Patient",
+          imageUrl: clerkUser?.imageUrl || "",
+          role: "PATIENT",
+          creditTransactions: {
+            create: {
+              type: "ADMIN_ADJUSTMENT",
+              amount: 2
+            }
+          }
         },
       });
 
       revalidatePath("/");
-      return { success: true, redirectUrl: "/doctors" };
+      return { success: true, redirect: "/doctors" };
     }
 
-    if (role === "doctor") {
-      const speciality = formData.get("speciality");
-      const experience = parseInt(formData.get("experience"), 10);
-      const credintials = formData.get("credentialUrl");
-      const description = formData.get("description");
+    // DOCTOR FLOW
+    if (role === "DOCTOR") {
+      const specialty = formData.get("specialty")?.toString();
+      const experienceRaw = formData.get("experience");
+      const credentialUrl = formData.get("credentialUrl")?.toString();
+      const description = formData.get("description")?.toString();
 
-      if (!speciality || !experience || !credintials || !description) {
-        throw new Error("All fields are required for doctor registration");
+      const experience = parseInt(experienceRaw, 10);
+
+      // Validation
+      if (
+        !specialty ||
+        !credentialUrl ||
+        !description ||
+        Number.isNaN(experience)
+      ) {
+        throw new Error("All doctor fields are required");
       }
 
-      await db.user.update({
-        where: {
-          clerkUserId: userId,
-        },
-        data: {
+      // Get user info from Clerk
+      const clerkUser = await currentUser();
+      const primaryEmail = clerkUser?.emailAddresses?.find(
+        (e) => e.id === clerkUser.primaryEmailAddressId
+      )?.emailAddress;
+
+      await db.user.upsert({
+        where: { clerkUserId: userId },
+        update: {
           role: "DOCTOR",
-          speciality,
+          specialty,
           experience,
-          credentialUrl: credintials,
+          credentialUrl,
+          description,
+          verificationStatus: VerificationStatus.PENDING,
+        },
+        create: {
+          clerkUserId: userId,
+          email: primaryEmail || "",
+          name: [clerkUser?.firstName, clerkUser?.lastName].filter(Boolean).join(" ") || "Doctor",
+          imageUrl: clerkUser?.imageUrl || "",
+          role: "DOCTOR",
+          specialty,
+          experience,
+          credentialUrl,
           description,
           verificationStatus: VerificationStatus.PENDING,
         },
       });
-    }
 
-    revalidatePath("/");
-    return { success: true, redirectUrl: "/doctors/verification" };
+      revalidatePath("/");
+      return { success: true, redirect: "/doctor/verification" };
+    }
   } catch (error) {
-    console.error("Error updating user role:", error);
-    throw new Error("Failed to update user role. Please try again.");
+    console.error("Failed to set user role:", error);
+    throw new Error(`Failed to update user profile: ${error.message}`);
+  }
+}
+
+/**
+ * Gets the current user's complete profile information
+ */
+export async function getCurrentUser() {
+  const { userId } = await auth();
+
+  if (!userId) {
+    return null;
+  }
+
+  try {
+    const user = await db.user.findUnique({
+      where: {
+        clerkUserId: userId,
+      },
+    });
+
+    return user;
+  } catch (error) {
+    console.error("Failed to get user information:", error);
+    return null;
   }
 }

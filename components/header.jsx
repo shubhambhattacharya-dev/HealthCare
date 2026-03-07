@@ -17,12 +17,23 @@ import { checkAndAllocateCredits } from '../actions/credits'
 
 const Header = async () => {
 
-  let user = await checkUser();
+  let user = null;
+  
+  try {
+    user = await checkUser();
+  } catch (e) {
+    // Database might not be ready, continue without user
+    console.warn('checkUser failed:', e.message);
+  }
 
   // Initialize credits for patient users if not already done
   if (user?.role === "PATIENT") {
-    await checkAndAllocateCredits(user.id);
-    user = await checkUser(); // refetch updated credits
+    try {
+      await checkAndAllocateCredits(user.id);
+      user = await checkUser(); // refetch updated credits
+    } catch (e) {
+      console.warn('checkAndAllocateCredits failed:', e.message);
+    }
   }
 
   return (
@@ -128,7 +139,7 @@ const Header = async () => {
           </SignedIn>
 
           {/* credit button */}
-          {(!user || user?.role === "PATIENT") && (
+          {(!user || user?.role === "PATIENT" || user?.role === "UNASSIGNED") && (
             <Link href="/pricing">
               <Badge
                 variant="outline"

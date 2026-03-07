@@ -99,6 +99,7 @@ export default function Home() {
                 src="/poster2.png"
                 alt="DocNow - Book a Doctor Instantly"
                 fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
                 priority
                 className="object-cover rounded-3xl"
               />
