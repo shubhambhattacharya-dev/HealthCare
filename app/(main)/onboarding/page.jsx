@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from "zod";
@@ -9,9 +9,11 @@ import { Button } from '@/components/ui/button';
 import { User, Stethoscope, Loader2 } from 'lucide-react';
 import useFetch from '@/hooks/use-fetch';
 import { setUserRole } from '@/actions/onboarding';
+import { useRouter } from 'next/navigation';
+import { toast } from "sonner";
 
 const doctorFormSchema = z.object({
-  speciality: z.string().min(1, "speciality required"),
+  specialty: z.string().min(1, "specialty required"),
   experience: z.number()
     .min(1, "experience must be at least 1 year")
     .max(70, "Experience must be less than 70 years"),
@@ -25,7 +27,9 @@ const doctorFormSchema = z.object({
 
 const OnboardingPage = () => {
 
-  const [step, setstep] = useState("choose-role");
+  const [step, setStep] = useState("choose-role");
+
+  const router = useRouter();
 
   const { data, fn: submitUserRole, loading } = useFetch(setUserRole);
 
@@ -38,26 +42,30 @@ const OnboardingPage = () => {
   } = useForm({
     resolver: zodResolver(doctorFormSchema),
     defaultValues: {
-      speciality: "",
+      specialty: "",
       experience: undefined,
       credentialUrl: "",
       description: "",
     }
   });
 
-  const specialityValue = watch("speciality");
+  const specialityValue = watch("specialty");
 
-  const handlePateinetSelection = async () => {
-    if (loading) {
-      return;
-    }
+  const handlePatientSelection = async () => {
+    if (loading) return;
 
     const formData = new FormData();
     formData.append("role", "PATIENT");
 
     await submitUserRole(formData);
-    setstep("patient");
   }
+
+  useEffect(() => {
+    if (data && data?.success) {
+      toast.success("role selected");
+      router.push(data.redirect);
+    }
+  }, [data, router]);
 
   // step 1: choose the role
   if (step === "choose-role") {
@@ -66,7 +74,7 @@ const OnboardingPage = () => {
 
         {/* Patient Card */}
         <Card
-          onClick={() => !loading && handlePateinetSelection()}
+          onClick={() => !loading && handlePatientSelection()}
           className="border border-emerald-900/20 hover:border-emerald-600/50 cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-lg hover:shadow-emerald-900/20 bg-card"
         >
           <CardContent className="pt-8 pb-8 flex flex-col items-center text-center">
@@ -99,7 +107,7 @@ const OnboardingPage = () => {
 
         {/* Doctor Card */}
         <Card
-          onClick={() => setstep("doctor-form")}
+          onClick={() => !loading && setStep("doctor-form")}
           className="border border-emerald-900/20 hover:border-emerald-600/50 cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-lg hover:shadow-emerald-900/20 bg-card"
         >
           <CardContent className="pt-8 pb-8 flex flex-col items-center text-center">
@@ -130,4 +138,4 @@ const OnboardingPage = () => {
   return null;
 }
 
-export default OnboardingPage
+export default OnboardingPage;

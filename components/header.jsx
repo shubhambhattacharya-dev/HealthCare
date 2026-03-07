@@ -29,7 +29,7 @@ const Header = async () => {
   // Initialize credits for patient users if not already done
   if (user?.role === "PATIENT") {
     try {
-      await checkAndAllocateCredits(user.id);
+      await checkAndAllocateCredits();
       user = await checkUser(); // refetch updated credits
     } catch (e) {
       console.warn('checkAndAllocateCredits failed:', e.message);
@@ -43,7 +43,7 @@ const Header = async () => {
         <Link href="/">
           <Image
             src="/docnow-logo-transparent.png"
-            alt="Mediment logo"
+            alt="DocNow logo"
             width={200}
             height={200}
             className='h-10 w-auto object-contain'

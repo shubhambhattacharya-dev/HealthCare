@@ -5,7 +5,7 @@ const useFetch = (cp) => {
 
     // 3 stage
     const [data, setData] = useState(undefined);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(undefined);
 
     const fn = async (...args) => {

@@ -64,7 +64,7 @@ const existingTransaction = dbUser.creditTransactions?.find((t) => {
   const transactionMonth = format(t.createdAt, "MM-yyyy");
   return (
     transactionMonth === currentMonth &&
-    t.packageId === currentPlan
+    t.type === "ADMIN_ADJUSTMENT"
   );
 });
 
@@ -82,8 +82,8 @@ const updatedUser = await db.$transaction(async (tx) => {
   await tx.creditTransaction.create({
     data: {
       userId: dbUser.id,
-      type: "SUBSCRIPTION_GRANT",
-      packageId: currentPlan,
+      type: "ADMIN_ADJUSTMENT",
+      description: `Monthly credits for ${currentPlan} plan`,
       amount: creditsNeeded,
     },
   });

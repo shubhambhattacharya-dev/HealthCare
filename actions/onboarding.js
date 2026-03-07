@@ -56,6 +56,7 @@ export async function setUserRole(formData) {
           name: [clerkUser?.firstName, clerkUser?.lastName].filter(Boolean).join(" ") || "Patient",
           imageUrl: clerkUser?.imageUrl || "",
           role: "PATIENT",
+          credits: 2,
           creditTransactions: {
             create: {
               type: "ADMIN_ADJUSTMENT",
