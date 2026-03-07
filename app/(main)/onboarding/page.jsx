@@ -6,7 +6,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from "zod";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { User, Stethoscope } from 'lucide-react';
+import { User, Stethoscope, Loader2 } from 'lucide-react';
+import useFetch from '@/hooks/use-fetch';
+import { setUserRole } from '@/actions/onboarding';
 
 const doctorFormSchema = z.object({
   speciality: z.string().min(1, "speciality required"),
@@ -24,6 +26,8 @@ const doctorFormSchema = z.object({
 const OnboardingPage = () => {
 
   const [step, setstep] = useState("choose-role");
+
+  const { data, fn: submitUserRole, loading } = useFetch(setUserRole);
 
   const {
     register,
@@ -43,6 +47,18 @@ const OnboardingPage = () => {
 
   const specialityValue = watch("speciality");
 
+  const handlePateinetSelection = async () => {
+    if (loading) {
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("role", "PATIENT");
+
+    await submitUserRole(formData);
+    setstep("patient");
+  }
+
   // step 1: choose the role
   if (step === "choose-role") {
     return (
@@ -50,7 +66,7 @@ const OnboardingPage = () => {
 
         {/* Patient Card */}
         <Card
-          onClick={() => setstep("patient")}
+          onClick={() => !loading && handlePateinetSelection()}
           className="border border-emerald-900/20 hover:border-emerald-600/50 cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-lg hover:shadow-emerald-900/20 bg-card"
         >
           <CardContent className="pt-8 pb-8 flex flex-col items-center text-center">
@@ -63,9 +79,21 @@ const OnboardingPage = () => {
             <CardDescription className="mb-6 text-sm leading-relaxed">
               Search verified doctors, book appointments instantly, and manage your entire healthcare journey — all in one place.
             </CardDescription>
-            <Button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium">
-              Get Started as Patient
+
+            <Button
+              className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                "Get Started as Patient"
+              )}
             </Button>
+
           </CardContent>
         </Card>
 
