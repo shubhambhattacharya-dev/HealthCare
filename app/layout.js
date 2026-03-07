@@ -5,6 +5,8 @@ import Headers from "../components/header";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { Toaster } from "sonner";
+import { checkUser } from "@/lib/checkUser";
+import { checkAndAllocateCredits } from "@/actions/credits";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -20,7 +22,26 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+
+  let user = null;
+  
+  try {
+    user = await checkUser();
+  } catch (e) {
+    console.warn('checkUser failed:', e.message);
+  }
+
+  // Initialize credits for patient users if not already done
+  if (user?.role === "PATIENT") {
+    try {
+      await checkAndAllocateCredits();
+      user = await checkUser();
+    } catch (e) {
+      console.warn('checkAndAllocateCredits failed:', e.message);
+    }
+  }
+
   return (
     <ClerkProvider appearance={{ baseTheme:  dark }}>
     <html lang="en" suppressHydrationWarning>
@@ -34,7 +55,7 @@ export default function RootLayout({ children }) {
                     disableTransitionOnChange
                   >
         {/* header */}
-        <Headers/>
+        <Headers user={user}/>
         <main className="min-h-screen">{children}</main>
       <Toaster richColors position="top-right" />
 

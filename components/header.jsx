@@ -1,3 +1,5 @@
+"use client"
+
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -11,30 +13,9 @@ import {
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
 
-import { checkUser } from '@/lib/checkUser'
 import { Calendar, CreditCard, ShieldCheck, Stethoscope, User } from 'lucide-react'
-import { checkAndAllocateCredits } from '../actions/credits'
 
-const Header = async () => {
-
-  let user = null;
-  
-  try {
-    user = await checkUser();
-  } catch (e) {
-    // Database might not be ready, continue without user
-    console.warn('checkUser failed:', e.message);
-  }
-
-  // Initialize credits for patient users if not already done
-  if (user?.role === "PATIENT") {
-    try {
-      await checkAndAllocateCredits();
-      user = await checkUser(); // refetch updated credits
-    } catch (e) {
-      console.warn('checkAndAllocateCredits failed:', e.message);
-    }
-  }
+const Header = ({ user }) => {
 
   return (
     <header className='fixed top-0 w-full border-b bg-background/80 backdrop-blur-sm z-10 supports-[backdrop-filter]:bg-background/80'>
