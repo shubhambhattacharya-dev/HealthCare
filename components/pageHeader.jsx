@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
 const PageHeader = ({
-  icon,                        // fixed: was `icons` (plural) — now `icon` (singular)
+  icon,
   title = "",
   description = "",
   backLink = "/",
@@ -34,8 +34,9 @@ const PageHeader = ({
 
         {/* Icon block */}
         {icon && (
-          <div className="shrink-0 p-3 bg-emerald-900/20 rounded-2xl ring-1 ring-emerald-700/30 mb-1">
-            <div className="text-emerald-400">
+          <div className="shrink-0 p-3.5 bg-emerald-900/20 rounded-2xl ring-1 ring-emerald-600/40 mb-1 shadow-lg shadow-emerald-900/20 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent rounded-2xl pointer-events-none" />
+            <div className="text-emerald-400 relative z-10">
               {React.cloneElement(icon, {
                 className: "h-8 w-8 md:h-10 md:w-10",
               })}
@@ -44,14 +45,17 @@ const PageHeader = ({
         )}
 
         {/* Title + description */}
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1.5">
           {title && (
-            <h1 className="text-4xl md:text-5xl font-bold gradient-title leading-tight">
-              {title}
-            </h1>
+            <div className="relative">
+              <h1 className="text-4xl md:text-5xl font-bold gradient-title leading-tight">
+                {title}
+              </h1>
+              <div className="mt-1.5 h-0.5 w-16 rounded-full bg-gradient-to-r from-emerald-500 to-transparent" />
+            </div>
           )}
           {description && (
-            <p className="text-sm text-muted-foreground leading-relaxed max-w-xl">
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-xl mt-1">
               {description}
             </p>
           )}
@@ -63,4 +67,4 @@ const PageHeader = ({
   )
 }
 
-export default PageHeader          // fixed: was `pageHeader` (lowercase) → `PageHeader`
+export default PageHeader

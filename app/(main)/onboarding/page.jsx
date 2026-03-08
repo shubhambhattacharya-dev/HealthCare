@@ -1,3 +1,5 @@
+// app/onboarding/page.tsx
+
 "use client"
 
 import React, { useEffect, useState } from 'react'
@@ -6,9 +8,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from "zod";
 import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { User, Stethoscope, Loader2, AlertCircle, CheckCircle2, Shield, Star, Clock, BadgeCheck, Users } from 'lucide-react';
+import { User, Stethoscope, Loader2, AlertCircle, CheckCircle2, BadgeCheck } from 'lucide-react';
 import useFetch from '@/hooks/use-fetch';
-import { setUserRole } from '@/actions/onboarding';
+import { getCurrentUser, setUserRole } from '@/actions/onboarding';
 import { useRouter } from 'next/navigation';
 import { toast } from "sonner";
 import { Label } from '@/components/ui/label';
@@ -65,7 +67,7 @@ const CharCounter = ({ value = "", max }) => {
   );
 };
 
-// ─── NEW: Badge component ──────────────────────────────────────────────────────
+// ─── Badge component (UNTOUCHED) ──────────────────────────────────────────────
 const Badge = ({ icon: Icon, label, variant = "default" }) => {
   const styles = {
     default:  "bg-emerald-950/60 border-emerald-800/50 text-emerald-300",
@@ -81,7 +83,7 @@ const Badge = ({ icon: Icon, label, variant = "default" }) => {
   );
 };
 
-// ─── NEW: Section divider ──────────────────────────────────────────────────────
+// ─── Section divider (UNTOUCHED) ──────────────────────────────────────────────
 const Divider = ({ label }) => (
   <div className="flex items-center gap-3 my-1">
     <div className="flex-1 h-px bg-emerald-900/30" />
@@ -94,6 +96,7 @@ const Divider = ({ label }) => (
 const OnboardingPage = () => {
 
   const [step, setStep] = useState("choose-role");
+  const [checkingUser, setCheckingUser] = useState(true); // ✅ NEW
   const router = useRouter();
 
   const { data, fn: submitUserRole, loading } = useFetch(setUserRole);
@@ -117,6 +120,18 @@ const OnboardingPage = () => {
   const specialityValue = watch("specialty");
   const descriptionValue = watch("description");
 
+  // ✅ NEW — if REJECTED doctor lands here, skip role selection, go straight to form
+  useEffect(() => {
+    const checkRejected = async () => {
+      const user = await getCurrentUser();
+      if (user?.verificationStatus === "REJECTED") {
+        setStep("doctor-form");
+      }
+      setCheckingUser(false);
+    };
+    checkRejected();
+  }, []);
+
   // ── Handlers (UNTOUCHED) ────────────────────────────────────────────────────
   const handlePatientSelection = async () => {
     if (loading) return;
@@ -126,7 +141,7 @@ const OnboardingPage = () => {
   };
 
   const onDoctorSubmit = async (formValues) => {
-    if(loading) return;
+    if(loading) return
     const formData = new FormData();
     formData.append("role", "DOCTOR");
     formData.append("specialty", formValues.specialty);
@@ -147,16 +162,16 @@ const OnboardingPage = () => {
     }
   }, [data, router]);
 
+  // ✅ NEW — show nothing while checking user status
+  if (checkingUser) return null;
+
   // ── STEP 1 — Role selection ─────────────────────────────────────────────────
   if (step === "choose-role") {
     return (
       <div className="space-y-5">
 
-       
-
         <Divider label="Choose your role to get started" />
 
-        {/* ── Role cards (original grid — logic UNTOUCHED) ── */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
           {/* Patient card */}
@@ -168,21 +183,15 @@ const OnboardingPage = () => {
               <div className="p-4 bg-emerald-900/20 rounded-full mb-4 ring-1 ring-emerald-700/30">
                 <User className="h-8 w-8 text-emerald-400" />
               </div>
-
-              {/* ── Card badge ── */}
               <div className="mb-3">
                 <Badge label="Free" variant="gold" />
               </div>
-
               <CardTitle className="text-xl font-semibold text-foreground mb-3">
                 I&apos;m a Patient
               </CardTitle>
-
-              {/* ── Improved description ── */}
               <CardDescription className="mb-6 text-sm leading-relaxed">
                 Find verified specialists, book same-day appointments, and manage your complete healthcare journey — securely, in one place.
               </CardDescription>
-
               <Button
                 className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium"
                 disabled={loading}
@@ -208,21 +217,15 @@ const OnboardingPage = () => {
               <div className="p-4 bg-emerald-900/20 rounded-full mb-4 ring-1 ring-emerald-700/30">
                 <Stethoscope className="h-8 w-8 text-emerald-400" />
               </div>
-
-              {/* ── Card badge ── */}
               <div className="mb-3">
                 <Badge icon={BadgeCheck} label="Verified Professional" variant="verified" />
               </div>
-
               <CardTitle className="text-xl font-semibold text-foreground mb-3">
                 I&apos;m a Doctor
               </CardTitle>
-
-              {/* ── Improved description ── */}
               <CardDescription className="mb-6 text-sm leading-relaxed">
                 Create your verified profile, set your own schedule, and grow your practice by reaching thousands of patients who need your expertise.
               </CardDescription>
-
               <Button
                 disabled={loading}
                 className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium"
@@ -246,7 +249,6 @@ const OnboardingPage = () => {
       <Card className="border border-emerald-900/20">
         <CardContent className="pt-8">
 
-          {/* ── Section heading ── */}
           <div className="mb-2 pb-5 border-b border-emerald-900/25">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2.5 bg-emerald-900/25 rounded-xl ring-1 ring-emerald-700/30">
@@ -264,11 +266,6 @@ const OnboardingPage = () => {
             </CardDescription>
           </div>
 
-         
-
-          
-
-          {/* ── Error banner (UNTOUCHED logic) ── */}
           {isSubmitted && errorCount > 0 && (
             <div className="flex items-start gap-3 mb-6 mt-5 p-4 rounded-lg bg-red-500/10 border border-red-500/30">
               <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
@@ -283,7 +280,6 @@ const OnboardingPage = () => {
             </div>
           )}
 
-          {/* ── Form (ALL logic UNTOUCHED) ── */}
           <form
             onSubmit={handleSubmit(onDoctorSubmit, onInvalid)}
             className="space-y-6 mt-5"
@@ -381,7 +377,7 @@ const OnboardingPage = () => {
               <span className="text-red-500">*</span> All fields are required. Your information is reviewed by our team and never shared publicly without consent.
             </p>
 
-            {/* BUTTONS (logic UNTOUCHED) */}
+            {/* BUTTONS */}
             <div className="pt-2 flex items-center justify-between gap-2">
               <Button
                 type="button"

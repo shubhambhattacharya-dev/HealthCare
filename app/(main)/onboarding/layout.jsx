@@ -1,3 +1,5 @@
+// app/onboarding/layout.tsx
+
 import { getCurrentUser } from '@/actions/onboarding'
 import { redirect } from 'next/navigation';
 import React from 'react'
@@ -18,7 +20,9 @@ const onboardingLayout = async ({ children }) => {
     else if (user.role === 'DOCTOR') {
       if (user.verificationStatus === "VERIFIED") {
         redirect("/doctor");
-      } else {
+      }
+      // ✅ ONLY PENDING redirects — REJECTED can re-fill the form
+      else if (user.verificationStatus === "PENDING") {
         redirect("/doctor/verification");
       }
     }
@@ -32,7 +36,6 @@ const onboardingLayout = async ({ children }) => {
       <div className='max-w-3xl mx-auto'>
         <div className='text-center mb-10 flex flex-col items-center'>
 
-          {/* Badge - teal to match your theme */}
           <span className="inline-flex items-center gap-2 mb-4 px-4 py-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-xs font-semibold tracking-widest uppercase w-fit">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             Onboarding
@@ -46,7 +49,6 @@ const onboardingLayout = async ({ children }) => {
             Tell us how you&apos;d like to use the platform — so we can tailor your experience.
           </p>
 
-          {/* Subtle divider accent */}
           <div className="mt-6 flex items-center gap-3 w-full max-w-xs">
             <div className="flex-1 h-px bg-gradient-to-r from-transparent to-emerald-500/40" />
             <span className="text-emerald-500/60 text-xs">✦</span>
