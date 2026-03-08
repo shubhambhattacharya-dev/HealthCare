@@ -126,6 +126,7 @@ const OnboardingPage = () => {
   };
 
   const onDoctorSubmit = async (formValues) => {
+    if(loading) return;
     const formData = new FormData();
     formData.append("role", "DOCTOR");
     formData.append("specialty", formValues.specialty);
