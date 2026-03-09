@@ -77,7 +77,7 @@ const Header = ({ user }) => {
 
             {/* patient */}
             {user?.role === "PATIENT" && (
-              <Link href="/appointment">
+              <Link href="/appointments">
                 <Button
                   variant="outline"
                   className="hidden md:inline-flex items-center gap-2"
@@ -152,7 +152,7 @@ const Header = ({ user }) => {
             <UserButton
               appearance={{
                 elements: {
-                  avatarBox: "w-15 h-15",
+                  avatarBox: "w-10 h-10",
                   userButtonPopoverCard: "shadow-xl",
                   userPreviewMainIdentifier: "font-semibold",
                 }

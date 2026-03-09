@@ -2,7 +2,7 @@ import { getCurrentUser } from '@/actions/onboarding'
 import React from 'react'
 import { redirect } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { AlertCircle, ClipboardCheckIcon, Clock, FileText, Mail, XCircle } from 'lucide-react'
+import { AlertCircle, ClipboardCheck, Clock, FileText, Mail, XCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
@@ -31,7 +31,7 @@ const VerificationPage = async () => {
               {isRejected ? (
                 <XCircle className='h-8 w-8 text-red-400'/>
               ) : (
-                <ClipboardCheckIcon className='h-8 w-8 text-amber-400'/>
+                <ClipboardCheck className='h-8 w-8 text-amber-400'/>
               )}
             </div>
 
@@ -114,7 +114,7 @@ const VerificationPage = async () => {
             <p className='text-muted-foreground mb-6 mt-4'>
                {isRejected 
                ? "You can update your doctor profile and resubmit for verification." 
-               : "while you wait , you can familiarize yourself with our platform or reach out to our support team if you have any questions or concerns."}
+               : "While you wait, you can familiarize yourself with our platform or reach out to our support team if you have any questions or concerns."}
             </p>
 
             <div className='flex flex-col sm:flex-row gap-4 justify-center'>

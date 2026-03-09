@@ -47,14 +47,17 @@ if (dbUser.role !== "PATIENT") {
 let currentPlan = "free_user";
 let creditsForPlan = PLAN_CREDITS.free_user;
 
-// calculate difference
-const creditsNeeded = creditsForPlan - dbUser.credits;
+// Get current credits from user record (already calculated from transactions)
+const currentCredits = dbUser.credits;
+
+// Calculate difference - only top up if user has LESS than plan credits
+const creditsNeeded = creditsForPlan - currentCredits;
 
 if (creditsNeeded <= 0) {
   return {
     success: true,
     message: "Credits already up to date",
-    credits: dbUser.credits,
+    credits: currentCredits,
   };
 }
 
@@ -72,7 +75,7 @@ if (existingTransaction) {
   return {
     success: true,
     message: "Credits already allocated this month",
-    credits: dbUser.credits,
+    credits: currentCredits,
   };
 }
 

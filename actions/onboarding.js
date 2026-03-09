@@ -45,10 +45,34 @@ export async function setUserRole(formData) {
         (e) => e.id === clerkUser.primaryEmailAddressId
       )?.emailAddress;
       
+      // Check if user already exists
+      const existingUser = await db.user.findUnique({
+        where: { clerkUserId: userId },
+        include: { creditTransactions: true }
+      });
+
+      // If user exists with role already set, just return success
+      if (existingUser && existingUser.role === "PATIENT") {
+        revalidatePath("/");
+        return { success: true, redirect: "/doctors" };
+      }
+
+      // Calculate existing credits from transactions
+      const existingCredits = existingUser?.creditTransactions?.reduce((sum, t) => {
+        if (t.type === "CREDIT_PURCHASE" || t.type === "REFUND" || t.type === "ADMIN_ADJUSTMENT") {
+          return sum + t.amount;
+        }
+        if (t.type === "APPOINTMENT_DEDUCTION") {
+          return sum - t.amount;
+        }
+        return sum;
+      }, 0) || 0;
+
       await db.user.upsert({
         where: { clerkUserId: userId },
         update: {
           role: "PATIENT",
+          credits: existingCredits || 2
         },
         create: {
           clerkUserId: userId,
@@ -60,7 +84,8 @@ export async function setUserRole(formData) {
           creditTransactions: {
             create: {
               type: "ADMIN_ADJUSTMENT",
-              amount: 2
+              amount: 2,
+              description: "Welcome credits"
             }
           }
         },
