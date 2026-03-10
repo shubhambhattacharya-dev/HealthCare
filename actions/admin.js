@@ -117,7 +117,7 @@ export async function getDoctorsBySpeciality(speciality) {
       where: {
         role: "DOCTOR",
         verificationStatus: "VERIFIED",
-        speciality: speciality,
+        specialty: speciality,
       },
       orderBy: {
         createdAt: "desc",
