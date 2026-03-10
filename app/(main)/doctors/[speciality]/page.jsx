@@ -1,15 +1,18 @@
-"use client"
+import PageHeader from '@/components/pageHeader';
+import React from 'react';
 
-import { useParams } from "next/navigation"
-import React from "react"
-
-const Speciality = () => {
-
-  const { speciality } = useParams()
+const SpecialityPage = async ({ params }) => {
+  const { speciality } = await params; // 
 
   return (
-    <div>speciality : {speciality}</div>
-  )
-}
+    <div>
+      <PageHeader
+        title={speciality ? decodeURIComponent(speciality) : 'Speciality'} 
+        backLink="/doctors"
+        backLabel="All Specialities"
+      />
+    </div>
+  );
+};
 
-export default Speciality
+export default SpecialityPage;
