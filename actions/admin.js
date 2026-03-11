@@ -9,7 +9,6 @@ export async function verifyAdmin() {
   const { userId } = await auth();
 
   if (!userId) {
-    throw new Error("Unauthorized");
     return false;
   }
 

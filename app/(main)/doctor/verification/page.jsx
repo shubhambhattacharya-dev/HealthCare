@@ -10,6 +10,11 @@ const VerificationPage = async () => {
 
   const user = await getCurrentUser();
 
+  // Redirect if not a doctor
+  if (!user || user.role !== "DOCTOR") {
+    redirect("/onboarding");
+  }
+
   if (user?.verificationStatus === "VERIFIED") {
     redirect("/doctor");
   }

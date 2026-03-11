@@ -1,6 +1,6 @@
 "use client"
 
-import React from 'react'
+import React, { useSyncExternalStore } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
@@ -15,7 +15,23 @@ import { Badge } from './ui/badge'
 
 import { Calendar, CreditCard, ShieldCheck, Stethoscope, User } from 'lucide-react'
 
-const Header = ({ user }) => {
+// Hook to check if we're on the client
+function useHydrated() {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+}
+
+const Header = ({ user: serverUser }) => {
+  const isHydrated = useHydrated();
+  
+ 
+  const user = serverUser;
+
+ 
+  const showRoleContent = isHydrated && user;
 
   return (
     <header className='fixed top-0 w-full border-b bg-background/80 backdrop-blur-sm z-10 supports-[backdrop-filter]:bg-background/80'>
@@ -28,6 +44,7 @@ const Header = ({ user }) => {
             width={200}
             height={200}
             className='h-10 w-auto object-contain'
+            priority
           />
         </Link>
 
@@ -36,7 +53,7 @@ const Header = ({ user }) => {
           <SignedIn>
 
             {/* admin */}
-            {user?.role === "ADMIN" && (
+            {showRoleContent && user?.role === "ADMIN" && (
               <Link href="/admin">
                 <Button
                   variant='outline'
@@ -56,7 +73,7 @@ const Header = ({ user }) => {
             )}
 
             {/* doctor */}
-            {user?.role === "DOCTOR" && (
+            {showRoleContent && user?.role === "DOCTOR" && (
               <Link href="/doctor">
                 <Button
                   variant="outline"
@@ -76,7 +93,7 @@ const Header = ({ user }) => {
             )}
 
             {/* patient */}
-            {user?.role === "PATIENT" && (
+            {showRoleContent && user?.role === "PATIENT" && (
               <Link href="/appointments">
                 <Button
                   variant="outline"
@@ -96,7 +113,7 @@ const Header = ({ user }) => {
             )}
 
             {/* unassigned */}
-            {user?.role === "UNASSIGNED" && (
+            {showRoleContent && user?.role === "UNASSIGNED" && (
               <Link href="/onboarding">
 
                 <Button
@@ -120,7 +137,7 @@ const Header = ({ user }) => {
           </SignedIn>
 
           {/* credit button */}
-          {(!user || user?.role === "PATIENT" || user?.role === "UNASSIGNED") && (
+          {(!showRoleContent || user?.role === "PATIENT" || user?.role === "UNASSIGNED") && (
             <Link href="/pricing">
               <Badge
                 variant="outline"
@@ -129,7 +146,7 @@ const Header = ({ user }) => {
                 <CreditCard className="h-3.5 w-3.5 text-emerald-400" />
 
                 <span className="text-emerald-400">
-                  {user && user?.role === "PATIENT" ? (
+                  {showRoleContent && user && user?.role === "PATIENT" ? (
                     <>
                       {user.credits}{" "}
                       <span className="hidden md:inline">Credits</span>

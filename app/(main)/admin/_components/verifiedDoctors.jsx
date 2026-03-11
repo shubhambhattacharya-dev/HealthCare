@@ -55,11 +55,11 @@ export function VerifiedDoctors({ doctors }) {
 
     if (result?.success) {
       toast.success(`${suspend ? "Suspended" : "Reinstated"} ${doctor.name} successfully!`);
-      // Optimistic UI update
+      // Optimistic UI update - use verificationStatus instead of isActive
       setLocalDoctors((prev) =>
         prev.map((d) =>
           d.id === doctor.id
-            ? { ...d, isActive: !suspend }
+            ? { ...d, verificationStatus: suspend ? "PENDING" : "VERIFIED" }
             : d
         )
       );
@@ -70,9 +70,9 @@ export function VerifiedDoctors({ doctors }) {
     setTargetDoctor(null);
   };
 
-  // ✅ Fixed: use isActive field instead of verificationStatus
-  const activeCount    = localDoctors.filter((d) => d.isActive !== false).length;
-  const suspendedCount = localDoctors.filter((d) => d.isActive === false).length;
+  // ✅ Fixed: use verificationStatus field instead of isActive
+  const activeCount = localDoctors.filter((d) => d.verificationStatus === "VERIFIED").length;
+  const suspendedCount = localDoctors.filter((d) => d.verificationStatus === "PENDING").length;
 
   return (
     <div>
@@ -247,7 +247,7 @@ export function VerifiedDoctors({ doctors }) {
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {filteredDoctors.map((doctor) => {
-                  const isSuspended = doctor.isActive === false;
+                  const isSuspended = doctor.verificationStatus !== "VERIFIED";
                   const isThisLoading = loading && targetDoctor?.id === doctor.id;
 
                   return (

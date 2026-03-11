@@ -1,6 +1,6 @@
 "use server";
 
-import { db } from "@/lib/db";
+import { db } from "@/lib/prisma";
 
 
 /**
@@ -8,11 +8,12 @@ import { db } from "@/lib/db";
  */
 export async function getDoctorsBySpecialty(specialty) {
   try {
+    const decodedSpecialty = decodeURIComponent(specialty);
     const doctors = await db.user.findMany({
       where: {
         role: "DOCTOR",
         verificationStatus: "VERIFIED",
-        specialty: specialty.split("%20").join(" "),
+        specialty: decodedSpecialty,
       },
       orderBy: {
         name: "asc",

@@ -9,7 +9,7 @@ export const metadata = {
 
 const DoctorDashboardLayout = ({ children }) => {
   return (
-    <div className="container mx-auto px-12 pt-20">  {/* ← YAHI FIX HAI */}
+    <div className="container mx-auto px-12 pt-20">
         <PageHeader icon={<StethoscopeIcon />} title={'Doctor Dashboard'} />
         {children}
     </div>

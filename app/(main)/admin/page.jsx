@@ -1,4 +1,4 @@
-import { TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { PendingDoctors } from "./_components/pendingDoctor";
 import { VerifiedDoctors } from "./_components/verifiedDoctors";
 import { PendingPayouts } from "./_components/pendingPayout";
@@ -18,7 +18,7 @@ export default async function AdminPage() {
     ]);
 
   return (
-    <>
+    <Tabs defaultValue="pending" className="w-full">
       <TabsContent value="pending" className="border-none p-0">
         <PendingDoctors doctors={pendingDoctorsData.doctors || []} />
       </TabsContent>
@@ -30,6 +30,6 @@ export default async function AdminPage() {
       <TabsContent value="payouts" className="border-none p-0">
         <PendingPayouts payouts={pendingPayoutsData.payouts || []} />
       </TabsContent>
-    </>
+    </Tabs>
   );
 }

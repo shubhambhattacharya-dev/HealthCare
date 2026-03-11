@@ -36,43 +36,26 @@ export async function setUserRole(formData) {
   }
 
   try {
+    // Get user info from Clerk (only once)
+    const clerkUser = await currentUser();
+    const primaryEmail = clerkUser?.emailAddresses?.find(
+      (e) => e.id === clerkUser.primaryEmailAddressId
+    )?.emailAddress;
+
     // PATIENT FLOW
     if (role === "PATIENT") {
-      // Get user email from Clerk
-      const { userId } = await auth();
-      const clerkUser = await currentUser();
-      const primaryEmail = clerkUser?.emailAddresses?.find(
-        (e) => e.id === clerkUser.primaryEmailAddressId
-      )?.emailAddress;
-      
-      // Check if user already exists
-      const existingUser = await db.user.findUnique({
-        where: { clerkUserId: userId },
-        include: { creditTransactions: true }
-      });
-
-      // If user exists with role already set, just return success
-      if (existingUser && existingUser.role === "PATIENT") {
+      // Check if user already exists with role already set
+      if (user && user.role === "PATIENT") {
         revalidatePath("/");
         return { success: true, redirect: "/doctors" };
       }
 
-      // Calculate existing credits from transactions
-      const existingCredits = existingUser?.creditTransactions?.reduce((sum, t) => {
-        if (t.type === "CREDIT_PURCHASE" || t.type === "REFUND" || t.type === "ADMIN_ADJUSTMENT") {
-          return sum + t.amount;
-        }
-        if (t.type === "APPOINTMENT_DEDUCTION") {
-          return sum - t.amount;
-        }
-        return sum;
-      }, 0) || 0;
-
+      // Use upsert to either update existing user or create new one
+      // Keep existing credits if user already exists
       await db.user.upsert({
         where: { clerkUserId: userId },
         update: {
           role: "PATIENT",
-          credits: existingCredits || 2
         },
         create: {
           clerkUserId: userId,
@@ -114,12 +97,6 @@ export async function setUserRole(formData) {
         throw new Error("All doctor fields are required");
       }
 
-      // Get user info from Clerk
-      const clerkUser = await currentUser();
-      const primaryEmail = clerkUser?.emailAddresses?.find(
-        (e) => e.id === clerkUser.primaryEmailAddressId
-      )?.emailAddress;
-
       await db.user.upsert({
         where: { clerkUserId: userId },
         update: {
@@ -149,7 +126,9 @@ export async function setUserRole(formData) {
     }
   } catch (error) {
     console.error("Failed to set user role:", error);
-    throw new Error(`Failed to update user profile: ${error.message}`);
+    // Handle both Error objects and other types
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    throw new Error(`Failed to update user profile: ${errorMessage}`);
   }
 }
 

@@ -2,7 +2,7 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
-import { db } from "@/lib/db";
+import { db } from "@/lib/prisma";
 
 export async function setAvailabilitySlots(formData) {
   const { userId } = await auth();
@@ -74,7 +74,8 @@ export async function setAvailabilitySlots(formData) {
 
   } catch (error) {
     console.error("Error:", error);
-    throw new Error(error.message || "Error setting availability slots");
+    const errorMessage = error instanceof Error ? error.message : "Error setting availability slots";
+    throw new Error(errorMessage);
   }
 }
 
@@ -106,7 +107,7 @@ export async function getDoctorsAvailability() {
       },                   
     });
 
-    return { success: true, slots: availabilitySlots }; // 
+    return { success: true, slots: availabilitySlots }; 
 
   } catch (error) {
     console.error("Error fetching availability:", error);
@@ -114,6 +115,82 @@ export async function getDoctorsAvailability() {
   }
 }
 
-export async function getDoctorAppointments(){
-    return [];
+export async function getDoctorAppointments() {
+  const { userId } = await auth();
+
+  if (!userId) {
+    return { appointments: [] };
+  }
+
+  try {
+    const doctor = await db.user.findUnique({
+      where: {
+        clerkUserId: userId,
+        role: "DOCTOR",
+      },
+    });
+
+    if (!doctor) {
+      return { appointments: [] };
+    }
+
+    const appointments = await db.appointment.findMany({
+      where: {
+        doctorId: doctor.id,
+      },
+      include: {
+        patient: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            imageUrl: true,
+          },
+        },
+      },
+      orderBy: {
+        startTime: "desc",
+      },
+    });
+
+    return { appointments };
+  } catch (error) {
+    console.error("Error fetching doctor appointments:", error);
+    return { appointments: [] };
+  }
+}
+
+export async function getDoctorPayouts() {
+  const { userId } = await auth();
+
+  if (!userId) {
+    return { payouts: [] };
+  }
+
+  try {
+    const doctor = await db.user.findUnique({
+      where: {
+        clerkUserId: userId,
+        role: "DOCTOR",
+      },
+    });
+
+    if (!doctor) {
+      return { payouts: [] };
+    }
+
+    const payouts = await db.payout.findMany({
+      where: {
+        doctorId: doctor.id,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return { payouts };
+  } catch (error) {
+    console.error("Error fetching doctor payouts:", error);
+    return { payouts: [] };
+  }
 }

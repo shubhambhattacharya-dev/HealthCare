@@ -6,6 +6,10 @@ import Link from 'next/link'
 
 
 const DoctorCard = ({ doctor }) => {
+  // Derive computed properties from the user object
+  const isVerified = doctor.verificationStatus === 'VERIFIED';
+  const isAvailable = doctor.availability?.some(slot => slot.status === 'AVAILABLE') || false;
+
   return (
     <Link href={`/doctors/profile/${doctor.id}`}>
       
@@ -32,7 +36,7 @@ const DoctorCard = ({ doctor }) => {
                 )}
               </div>
               {/* Online/verified dot */}
-              {doctor.isVerified && (
+              {isVerified && (
                 <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-400 border-2 border-background rounded-full" />
               )}
             </div>
@@ -45,7 +49,7 @@ const DoctorCard = ({ doctor }) => {
                     {doctor.name}
                   </h3>
                   <p className="text-emerald-400/80 text-xs mt-0.5 font-medium">
-                    {doctor.speciality}
+                    {doctor.specialty}
                   </p>
                 </div>
                 <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all duration-200 flex-shrink-0 mt-0.5" />
@@ -59,13 +63,7 @@ const DoctorCard = ({ doctor }) => {
                     {doctor.experience} yrs exp
                   </span>
                 )}
-                {doctor.rating && (
-                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-                    {doctor.rating}
-                  </span>
-                )}
-                {doctor.isAvailable && (
+                {isAvailable && (
                   <span className="text-xs bg-emerald-900/30 text-emerald-400 border border-emerald-800/40 px-2 py-0.5 rounded-full font-medium">
                     Available Today
                   </span>
@@ -79,4 +77,4 @@ const DoctorCard = ({ doctor }) => {
   )
 }
 
-export default DoctorCard 
+export default DoctorCard

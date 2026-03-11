@@ -18,7 +18,16 @@ export const metadata = {
   description:
     "Book doctor appointments, consult via video, and manage your healthcare journey anytime, anywhere with DocNow.",
   icons: {
-    icon: "/favicon.png",
+    icon: [
+      { url: "/favicon.png" },
+      { url: "/favicon.ico", type: "image/x-icon" },
+    ],
+    apple: [
+      { url: "/favicon.png" },
+    ],
+    other: [
+      { rel: "icon", url: "/favicon.png" },
+    ],
   },
 };
 
@@ -33,10 +42,14 @@ export default async function RootLayout({ children }) {
   }
 
   // Initialize credits for patient users if not already done
+  // Note: checkAndAllocateCredits already returns updated user if successful
   if (user?.role === "PATIENT") {
     try {
-      await checkAndAllocateCredits();
-      user = await checkUser();
+      const result = await checkAndAllocateCredits();
+      // Use the credits from the allocation result if available
+      if (result?.credits !== undefined) {
+        user = { ...user, credits: result.credits };
+      }
     } catch (e) {
       console.warn('checkAndAllocateCredits failed:', e.message);
     }

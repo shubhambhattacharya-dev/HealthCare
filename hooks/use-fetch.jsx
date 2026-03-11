@@ -16,12 +16,13 @@ const useFetch = (cp) => {
             const response = await cp(...args);
             setData(response);
             setLoading(false);
-        } catch (error) {
-            setError(error);
-            toast.error(error.message);
-            
-        } finally{
+            return response;
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred";
+            setError(errorMessage);
+            toast.error(errorMessage);
             setLoading(false);
+            throw err;
         }
     }
 
