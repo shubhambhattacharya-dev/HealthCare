@@ -1,19 +1,17 @@
-import React from 'react'
-import PageHeader from '@/components/pageHeader'
-import { StethoscopeIcon } from 'lucide-react'
+import { Stethoscope } from "lucide-react";
+import PageHeader from "@/components/pageHeader";
 
 export const metadata = {
-    title: "Doctor Dashboard-DocNow",
-    description: "Your Health, Our Priority Book a Doctor Instantly"
-}
+  title: "Doctor Dashboard - MediMeet",
+  description: "Manage your appointments and availability",
+};
 
-const DoctorDashboardLayout = ({ children }) => {
+export default async function DoctorDashboardLayout({ children }) {
   return (
-    <div className="container mx-auto px-12 pt-20">
-        <PageHeader icon={<StethoscopeIcon />} title={'Doctor Dashboard'} />
-        {children}
-    </div>
-  )
-}
+    <div className="container mx-auto px-4 py-8">
+      <PageHeader icon={<Stethoscope />} title="Doctor Dashboard" />
 
-export default DoctorDashboardLayout
+      {children}
+    </div>
+  );
+}

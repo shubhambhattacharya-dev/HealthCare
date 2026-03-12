@@ -1,120 +1,76 @@
-import { redirect } from 'next/navigation';
-import React from 'react';
-import { getCurrentUser } from '@/actions/onboarding';
-import { getDoctorAppointments, getDoctorsAvailability, getDoctorPayouts } from '@/actions/doctor';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { AlertCircle, Calendar, CreditCard } from 'lucide-react';
-import AvailableSlots from './_components/availableSlots';
-import Appointments from './_components/appointments';
-import Payouts from './_components/payouts';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { getDoctorAppointments, getDoctorsAvailability, getDoctorEarnings, getDoctorPayouts } from "@/actions/doctor";
+import AvailableSlots from "./_components/availableSlots";
+import { getCurrentUser } from "@/actions/onboarding";
+import { redirect } from "next/navigation";
+import { Calendar, Clock, DollarSign } from "lucide-react";
+import Appointments from "./_components/appointments";
+import Payouts from "./_components/payouts";
 
-const DoctorDashboard = async () => {
+export default async function DoctorDashboardPage() {
   const user = await getCurrentUser();
 
-  if (user?.role !== 'DOCTOR') {
-    redirect('/onboarding');
+  const [appointmentsData, availabilityData, earningsData, payoutsData] =
+    await Promise.all([
+      getDoctorAppointments(),
+      getDoctorsAvailability(),
+      getDoctorEarnings(),
+      getDoctorPayouts(),
+    ]);
+
+  //   // Redirect if not a doctor
+  if (user?.role !== "DOCTOR") {
+    redirect("/onboarding");
   }
 
-  if (user?.verificationStatus !== 'VERIFIED') {
-    redirect('/doctor/verification');
+  // If already verified, redirect to dashboard
+  if (user?.verificationStatus !== "VERIFIED") {
+    redirect("/doctor/verification");
   }
-
-  const [appointmentsData, availabilityData, payoutsData] = await Promise.all([
-    getDoctorAppointments(),
-    getDoctorsAvailability(),
-    getDoctorPayouts(),
-  ]);
 
   return (
     <Tabs
-      defaultValue="appointments"
-      className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6"
+      defaultValue="earnings"
+      className="grid grid-cols-1 md:grid-cols-4 gap-6"
     >
-      {/* Sidebar */}
-      <TabsList
-        className="
-          md:col-span-1
-          flex flex-row md:flex-col
-          w-full h-auto
-          bg-transparent
-          p-0 gap-1
-          items-start
-        "
-      >
+      <TabsList className="md:col-span-1 bg-muted/30 border h-14 md:h-40 flex sm:flex-row md:flex-col w-full p-2 md:p-1 rounded-md md:space-y-2 sm:space-x-2 md:space-x-0">
+        <TabsTrigger
+          value="earnings"
+          className="flex-1 md:flex md:items-center md:justify-start md:px-4 md:py-3 w-full"
+        >
+          <DollarSign className="h-4 w-4 mr-2 hidden md:inline" />
+          <span>Earnings</span>
+        </TabsTrigger>
         <TabsTrigger
           value="appointments"
-          className="
-            w-full justify-start px-4 py-3 rounded-lg
-            text-sm font-medium
-            text-muted-foreground
-            bg-transparent
-            hover:bg-muted/40 hover:text-foreground
-            data-[state=active]:bg-muted/50
-            data-[state=active]:text-foreground
-            data-[state=active]:font-semibold
-            transition-all duration-150
-            flex items-center gap-3
-          "
+          className="flex-1 md:flex md:items-center md:justify-start md:px-4 md:py-3 w-full"
         >
-          <Calendar className="h-4 w-4 shrink-0" />
-          Appointments
+          <Calendar className="h-4 w-4 mr-2 hidden md:inline" />
+          <span>Appointments</span>
         </TabsTrigger>
-
         <TabsTrigger
           value="availability"
-          className="
-            w-full justify-start px-4 py-3 rounded-lg
-            text-sm font-medium
-            text-muted-foreground
-            bg-transparent
-            hover:bg-muted/40 hover:text-foreground
-            data-[state=active]:bg-muted/50
-            data-[state=active]:text-foreground
-            data-[state=active]:font-semibold
-            transition-all duration-150
-            flex items-center gap-3
-          "
+          className="flex-1 md:flex md:items-center md:justify-start md:px-4 md:py-3 w-full"
         >
-          <AlertCircle className="h-4 w-4 shrink-0" />
-          Availability
-        </TabsTrigger>
-
-        <TabsTrigger
-          value="payouts"
-          className="
-            w-full justify-start px-4 py-3 rounded-lg
-            text-sm font-medium
-            text-muted-foreground
-            bg-transparent
-            hover:bg-muted/40 hover:text-foreground
-            data-[state=active]:bg-muted/50
-            data-[state=active]:text-foreground
-            data-[state=active]:font-semibold
-            transition-all duration-150
-            flex items-center gap-3
-          "
-        >
-          <CreditCard className="h-4 w-4 shrink-0" />
-          Payouts
+          <Clock className="h-4 w-4 mr-2 hidden md:inline" />
+          <span>Availability</span>
         </TabsTrigger>
       </TabsList>
-
-      {/* Content */}
       <div className="md:col-span-3">
-        <TabsContent value="appointments" className="border-none p-0 mt-0">
-          <Appointments appointments={appointmentsData?.appointments || []} />
+        <TabsContent value="appointments" className="border-none p-0">
+          <Appointments
+            appointments={appointmentsData.appointments || []}
+          />
         </TabsContent>
-
-        <TabsContent value="availability" className="border-none p-0 mt-0">
-          <AvailableSlots slots={availabilityData?.slots || []} />
+        <TabsContent value="availability" className="border-none p-0">
+          <AvailableSlots slots={availabilityData.slots || []} />
         </TabsContent>
-
-        <TabsContent value="payouts" className="border-none p-0 mt-0">
-          <Payouts payouts={payoutsData?.payouts || []} />
+        <TabsContent value="earnings" className="border-none p-0">
+          <Payouts
+            payouts={payoutsData.payouts || []}
+          />
         </TabsContent>
       </div>
     </Tabs>
   );
-};
-
-export default DoctorDashboard;
+}
