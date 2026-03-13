@@ -16,6 +16,9 @@ model User {
 
   role         UserRole @default(UNASSIGNED)
 
+  // Subscription plan
+  plan         String   @default("free_user")
+
   // Cached credit balance
   credits      Int      @default(0)
 

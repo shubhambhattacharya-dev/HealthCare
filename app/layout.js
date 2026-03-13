@@ -42,11 +42,9 @@ export default async function RootLayout({ children }) {
   }
 
   // Initialize credits for patient users if not already done
-  // Note: checkAndAllocateCredits already returns updated user if successful
   if (user?.role === "PATIENT") {
     try {
       const result = await checkAndAllocateCredits();
-      // Use the credits from the allocation result if available
       if (result?.credits !== undefined) {
         user = { ...user, credits: result.credits };
       }
