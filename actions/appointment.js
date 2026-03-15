@@ -294,7 +294,7 @@ export async function generateVideoToken(formData) {
     });
 
     // Generate the token with appropriate role and expiration
-    const token = vonage.video.generateToken(appointment.videoSessionId, {
+    const token = vonage.video.generateClientToken(appointment.videoSessionId, {
       role: user.role === "DOCTOR" ? "publisher" : "subscriber",
       expireTime: expirationTime,
       data: connectionData,

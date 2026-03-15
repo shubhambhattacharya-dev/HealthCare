@@ -37,8 +37,8 @@ export async function checkAndAllocateCredits() {
       return { success: false, message: "User not found" };
     }
 
-    if (dbUser.role !== "PATIENT") {
-      return { success: false, message: "Only patients receive credits" };
+    if (dbUser.role !== "PATIENT" && dbUser.role !== "ADMIN") {
+      return { success: false, message: "Only patients and admins receive credits" };
     }
 
     // determine plan - get from user record or default to free_user

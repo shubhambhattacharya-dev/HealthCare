@@ -5,9 +5,14 @@ import { db } from "@/lib/prisma";
 
 
 const PLAN_MAP = {
+  // Plan Keys (from Clerk Dashboard)
   "free_user": "free_user",
   "starter_plan": "starter",
   "pro": "pro",
+
+  // technical Plan IDs (from metadata or system events)
+  "cplan_3AOqkomATB61": "starter",
+  "cplan_3AOUqSQYh6y8": "pro",
 };
 
 export async function POST(req) {
@@ -103,7 +108,9 @@ export async function POST(req) {
       case "subscription.created":
       case "subscription.updated": {
         const { clerk_user_id, plan_id, status } = evt.data;
+        console.log(`Processing subscription: user=${clerk_user_id}, plan_id=${plan_id}, status=${status}`);
         const planName = PLAN_MAP[plan_id];
+        console.log(`Mapped plan_id ${plan_id} to internal plan name: ${planName}`);
 
         if (status === "active" && planName) {
           const user = await db.user.findUnique({

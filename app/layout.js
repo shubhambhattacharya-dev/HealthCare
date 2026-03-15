@@ -41,8 +41,8 @@ export default async function RootLayout({ children }) {
     console.warn('checkUser failed:', e.message);
   }
 
-  // Initialize credits for patient users if not already done
-  if (user?.role === "PATIENT") {
+  // Initialize credits for patient and admin users if not already done
+  if (user?.role === "PATIENT" || user?.role === "ADMIN") {
     try {
       const result = await checkAndAllocateCredits();
       if (result?.credits !== undefined) {

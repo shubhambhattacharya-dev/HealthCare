@@ -1,6 +1,7 @@
 "use client"
 
 import useFetch from '@/hooks/use-fetch'
+import { format } from 'date-fns'
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -125,9 +126,9 @@ export const AvailabilitySettings = ({ slots }) => {
                                                 <Clock className="h-4 w-4 text-emerald-400" />
                                             </div>
                                             <div className="flex items-center gap-2 flex-1 min-w-0">
-                                                <span className="text-white font-medium text-sm tabular-nums">{slot.startTime}</span>
+                                                <span className="text-white font-medium text-sm tabular-nums">{format(new Date(slot.startTime), "h:mm a")}</span>
                                                 <span className="text-zinc-600 text-xs">—</span>
-                                                <span className="text-white font-medium text-sm tabular-nums">{slot.endTime}</span>
+                                                <span className="text-white font-medium text-sm tabular-nums">{format(new Date(slot.endTime), "h:mm a")}</span>
                                             </div>
                                             <CheckCircle2 className="h-4 w-4 text-emerald-500/60 shrink-0" />
                                         </div>
