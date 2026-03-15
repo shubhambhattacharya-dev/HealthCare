@@ -18,7 +18,7 @@ import { Calendar, CreditCard, ShieldCheck, Stethoscope, User } from 'lucide-rea
 // Hook to check if we're on the client
 function useHydrated() {
   return useSyncExternalStore(
-    () => () => {},
+    () => () => { },
     () => true,
     () => false
   );
@@ -26,11 +26,11 @@ function useHydrated() {
 
 const Header = ({ user: serverUser }) => {
   const isHydrated = useHydrated();
-  
- 
+
+
   const user = serverUser;
 
- 
+
   const showRoleContent = isHydrated && user;
 
   return (
@@ -159,23 +159,27 @@ const Header = ({ user: serverUser }) => {
             </Link>
           )}
 
-          <SignedOut>
-            <SignInButton>
-              <Button variant='secondary'>Sign Up</Button>
-            </SignInButton>
-          </SignedOut>
+          {isHydrated && (
+            <>
+              <SignedIn>
+                <UserButton
+                  appearance={{
+                    elements: {
+                      avatarBox: "w-10 h-10",
+                      userButtonPopoverCard: "shadow-xl",
+                      userPreviewMainIdentifier: "font-semibold",
+                    }
+                  }}
+                />
+              </SignedIn>
 
-          <SignedIn>
-            <UserButton
-              appearance={{
-                elements: {
-                  avatarBox: "w-10 h-10",
-                  userButtonPopoverCard: "shadow-xl",
-                  userPreviewMainIdentifier: "font-semibold",
-                }
-              }}
-            />
-          </SignedIn>
+              <SignedOut>
+                <SignInButton>
+                  <Button variant='secondary'>Sign Up</Button>
+                </SignInButton>
+              </SignedOut>
+            </>
+          )}
 
         </div>
       </nav>

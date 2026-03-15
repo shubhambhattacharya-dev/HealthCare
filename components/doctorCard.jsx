@@ -23,12 +23,13 @@ const DoctorCard = ({ doctor }) => {
 
             {/* Avatar */}
             <div className="relative flex-shrink-0">
-              <div className="w-14 h-14 rounded-2xl bg-emerald-900/30 border border-emerald-800/30 group-hover:border-emerald-600/40 flex items-center justify-center overflow-hidden transition-all duration-200 group-hover:scale-105">
+              <div className="relative w-14 h-14 rounded-2xl bg-emerald-900/30 border border-emerald-800/30 group-hover:border-emerald-600/40 flex items-center justify-center overflow-hidden transition-all duration-200 group-hover:scale-105">
                 {doctor.imageUrl ? (
                   <Image
                     src={doctor.imageUrl}
                     alt={doctor.name}
                     fill
+                    sizes="(max-width: 768px) 56px, 56px"
                     className="w-full h-full object-cover"
                   />
                 ) : (

@@ -133,6 +133,7 @@ model CreditTransaction {
 enum TransactionType {
   CREDIT_PURCHASE
   APPOINTMENT_DEDUCTION
+  APPOINTMENT_EARNING
   REFUND
   ADMIN_ADJUSTMENT
 }

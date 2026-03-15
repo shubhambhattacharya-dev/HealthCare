@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Clock, ChevronRight, CheckCircle2 } from "lucide-react";
@@ -12,6 +12,15 @@ export function SlotPicker({ days, onSelectSlot }) {
   const firstDayWithSlots =
     days.find((day) => day.slots.length > 0)?.date || days[0]?.date;
   const [activeTab, setActiveTab] = useState(firstDayWithSlots);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null; // Or a loading skeleton
+  }
 
   const handleSlotSelect = (slot) => setSelectedSlot(slot);
 

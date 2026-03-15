@@ -26,16 +26,31 @@ export async function bookAppointment(formData) {
   }
 
   try {
-    // Get the patient user
+    // Get the user from database
     const patient = await db.user.findUnique({
       where: {
         clerkUserId: userId,
-        role: "PATIENT",
       },
     });
 
     if (!patient) {
-      throw new Error("Patient not found");
+      throw new Error("User record not found. Please try logging out and in again.");
+    }
+
+    if (patient.role === "DOCTOR") {
+      throw new Error("Doctors cannot book appointments as patients.");
+    }
+
+    if (patient.role === "ADMIN") {
+      throw new Error("Admins cannot book appointments.");
+    }
+
+    // If user is UNASSIGNED, they are now effectively a PATIENT
+    if (patient.role === "UNASSIGNED") {
+      await db.user.update({
+        where: { id: patient.id },
+        data: { role: "PATIENT" },
+      });
     }
 
     // Parse form data
@@ -162,7 +177,7 @@ export async function bookAppointment(formData) {
         data: {
           userId: doctor.id,
           amount: 2,
-          type: "APPOINTMENT_EARNING",
+          type: "ADMIN_ADJUSTMENT", // Temporary fix as APPOINTMENT_EARNING is not yet in the generated client
           description: `Appointment with ${patient.name}`,
         },
       });
@@ -196,7 +211,7 @@ export async function bookAppointment(formData) {
  */
 async function createVideoSession() {
   try {
-    const session = await vonage.video.sessions.createSession({
+    const session = await vonage.video.createSession({
       mediaMode: "routed"
     });
     return session.sessionId;
@@ -280,7 +295,7 @@ export async function generateVideoToken(formData) {
 
     // Generate the token with appropriate role and expiration
     const token = vonage.video.generateToken(appointment.videoSessionId, {
-      role: user.role === "DOCTOR" ? "publisher" : "publisher",
+      role: user.role === "DOCTOR" ? "publisher" : "subscriber",
       expireTime: expirationTime,
       data: connectionData,
     });

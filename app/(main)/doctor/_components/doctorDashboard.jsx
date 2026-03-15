@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import AvailableSlots from "./availableSlots";
 import { Calendar, Clock, DollarSign } from "lucide-react";
@@ -12,6 +13,16 @@ export default function DoctorDashboard({
   earningsData,
   payoutsData,
 }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null; // Or a loading skeleton
+  }
+
   return (
     <Tabs
       defaultValue="earnings"

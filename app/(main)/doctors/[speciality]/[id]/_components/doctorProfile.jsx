@@ -71,6 +71,7 @@ export function DoctorProfile({ doctor, availableDays }) {
                       src={doctor.imageUrl}
                       alt={doctor.name}
                       fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       className="object-cover"
                     />
                   ) : (
