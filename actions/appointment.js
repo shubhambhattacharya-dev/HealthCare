@@ -7,10 +7,16 @@ import { Vonage } from "@vonage/server-sdk";
 import { addDays, addMinutes, format, isBefore, endOfDay, isAfter } from "date-fns";
 import { Auth } from "@vonage/auth";
 
+import fs from "fs";
+import path from "path";
+
 // Initialize Vonage Video API client
+const privateKeyPath = path.join(process.cwd(), "lib", "private.key");
+const privateKey = fs.readFileSync(privateKeyPath, "utf8");
+
 const credentials = new Auth({
   applicationId: process.env.NEXT_PUBLIC_VONAGE_APPLICATION_ID,
-  privateKey: process.env.VONAGE_PRIVATE_KEY,
+  privateKey: privateKey,
 });
 const options = {};
 const vonage = new Vonage(credentials, options);
@@ -295,7 +301,7 @@ export async function generateVideoToken(formData) {
 
     // Generate the token with appropriate role and expiration
     const token = vonage.video.generateClientToken(appointment.videoSessionId, {
-      role: user.role === "DOCTOR" ? "publisher" : "subscriber",
+      role: "publisher", // Both Doctor and Patient should be publishers to share media
       expireTime: expirationTime,
       data: connectionData,
     });
