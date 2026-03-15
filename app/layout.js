@@ -34,7 +34,7 @@ export const metadata = {
 export default async function RootLayout({ children }) {
 
   let user = null;
-  
+
   try {
     user = await checkUser();
   } catch (e) {
@@ -54,50 +54,50 @@ export default async function RootLayout({ children }) {
   }
 
   return (
-    <ClerkProvider appearance={{ baseTheme:  dark }}>
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${inter.className} `}
-      >
+    <ClerkProvider appearance={{ baseTheme: dark }}>
+      <html lang="en" suppressHydrationWarning>
+        <body
+          className={`${inter.className} `}
+        >
           <ThemeProvider
-                    attribute="class"
-                    
-                    enableSystem
-                    disableTransitionOnChange
-                  >
-        {/* header */}
-        <Headers user={user}/>
-        <main className="min-h-screen">{children}</main>
-      <Toaster richColors position="top-right" />
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {/* header */}
+            <Headers user={user} />
+            <main className="min-h-screen">{children}</main>
+            <Toaster richColors position="top-right" />
 
-        {/* fotter */}
-       <footer className="relative bg-muted/50 py-12 overflow-hidden">
+            {/* fotter */}
+            <footer className="relative bg-muted/50 py-12 overflow-hidden">
 
-  {/* subtle glow */}
-  <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-transparent to-teal-400/5 pointer-events-none"></div>
+              {/* subtle glow */}
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-transparent to-teal-400/5 pointer-events-none"></div>
 
-  <div className="relative container mx-auto px-4 text-center">
+              <div className="relative container mx-auto px-4 text-center">
 
-    <p className="text-muted-foreground text-sm tracking-wide">
-      Made with{" "}
-      <span className="text-emerald-400 animate-pulse">❤️</span>{" "}
-      by{" "}
-      <span className="font-semibold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
-        Shubham
-      </span>
-    </p>
+                <p className="text-muted-foreground text-sm tracking-wide">
+                  Made with{" "}
+                  <span className="text-emerald-400 animate-pulse">❤️</span>{" "}
+                  by{" "}
+                  <span className="font-semibold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+                    Shubham
+                  </span>
+                </p>
 
-    <div className="mt-4 h-px w-24 mx-auto bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent"></div>
+                <div className="mt-4 h-px w-24 mx-auto bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent"></div>
 
-    <p className="mt-4 text-xs text-muted-foreground/70">
-      © {new Date().getFullYear()} Healthcare Platform. All rights reserved.
-    </p>
+                <p className="mt-4 text-xs text-muted-foreground/70">
+                  © {new Date().getFullYear()} Healthcare Platform. All rights reserved.
+                </p>
 
-  </div>
-</footer>
-        </ThemeProvider>
-      </body>
-    </html>
+              </div>
+            </footer>
+          </ThemeProvider>
+        </body>
+      </html>
     </ClerkProvider>
   );
 }
