@@ -177,7 +177,7 @@ export async function bookAppointment(formData) {
         data: {
           userId: doctor.id,
           amount: 2,
-          type: "ADMIN_ADJUSTMENT", // Temporary fix as APPOINTMENT_EARNING is not yet in the generated client
+          type: "APPOINTMENT_EARNING",
           description: `Appointment with ${patient.name}`,
         },
       });

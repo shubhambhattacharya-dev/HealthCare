@@ -8,7 +8,6 @@ import { db } from "@/lib/prisma";
 // credits per plan
 const PLAN_CREDITS = {
   free_user: 2,
-  basic: 5,
   starter: 10,
   pro: 24,
 };

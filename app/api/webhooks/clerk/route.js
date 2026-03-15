@@ -5,13 +5,13 @@ import { db } from "@/lib/prisma";
 
 
 const PLAN_MAP = {
-  "free_user-basic": "basic",
-  "free_user-starter": "starter",
+  "free_user": "free_user",
+  "starter_plan": "starter",
   "pro": "pro",
 };
 
 export async function POST(req) {
- 
+
   const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
 
   if (!WEBHOOK_SECRET) {
@@ -86,7 +86,7 @@ export async function POST(req) {
               email: primaryEmail,
               name,
               imageUrl: image_url,
-              credits: 2, 
+              credits: 2,
               creditTransactions: {
                 create: {
                   type: "ADMIN_ADJUSTMENT",
@@ -99,17 +99,22 @@ export async function POST(req) {
         }
         break;
 
-     
+
       case "subscription.created":
       case "subscription.updated": {
         const { clerk_user_id, plan_id, status } = evt.data;
         const planName = PLAN_MAP[plan_id];
 
         if (status === "active" && planName) {
+          const user = await db.user.findUnique({
+            where: { clerkUserId: clerk_user_id },
+          });
+
           await db.user.update({
             where: { clerkUserId: clerk_user_id },
             data: {
               plan: planName,
+              ...(user?.role === "UNASSIGNED" ? { role: "PATIENT" } : {}),
             },
           });
         }
@@ -121,7 +126,7 @@ export async function POST(req) {
         await db.user.update({
           where: { clerkUserId: clerk_user_id },
           data: {
-            plan: "free_user", 
+            plan: "free_user",
           },
         });
         break;
