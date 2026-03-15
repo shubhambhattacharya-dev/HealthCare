@@ -2,23 +2,23 @@
 
 import { db } from "@/lib/prisma";
 
-
 /**
  * Get doctors by specialty
  */
 export async function getDoctorsBySpecialty(specialty) {
   try {
-    const decodedSpecialty = decodeURIComponent(specialty);
+    console.log("Searching for specialty:", specialty, "which becomes:", specialty.split("%20").join(" "));
     const doctors = await db.user.findMany({
       where: {
         role: "DOCTOR",
         verificationStatus: "VERIFIED",
-        specialty: decodedSpecialty,
+        specialty: specialty.split("%20").join(" "),
       },
       orderBy: {
         name: "asc",
       },
     });
+    console.log("Found doctors:", doctors.length);
 
     return { doctors };
   } catch (error) {

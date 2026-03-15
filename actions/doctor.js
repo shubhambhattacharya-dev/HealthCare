@@ -49,20 +49,15 @@ export async function setAvailabilitySlots(formData) {
 
     // If slots exist, delete them all (we're replacing them)
     if (existingSlots.length > 0) {
-      // Don't delete slots that already have appointments
-      const slotsWithNoAppointments = existingSlots.filter(
-        (slot) => !slot.appointment
-      );
-
-      if (slotsWithNoAppointments.length > 0) {
-        await db.availability.deleteMany({
-          where: {
-            id: {
-              in: slotsWithNoAppointments.map((slot) => slot.id),
-            },
-          },
-        });
-      }
+      // NOTE: `slot.appointment` is not a valid relation on the Availability model. 
+      // Since `setAvailabilitySlots` represents the total working hours of a doctor (e.g. 9 to 5),
+      // we clear the old availability windows entirely so the new window takes effect. 
+      // Individual booked appointments are safely stored in the separate `Appointment` model.
+      await db.availability.deleteMany({
+        where: {
+          doctorId: doctor.id,
+        },
+      });
     }
 
     // Create new availability slot
@@ -502,13 +497,11 @@ export async function getDoctorEarnings() {
       },
     });
 
-    // Calculate total earnings (each completed appointment = 2 credits)
-    const totalEarnings = completedAppointments.length * 2;
-
-    return { 
+    // Each completed appointment is worth 2 credits
+    return {
       earnings: completedAppointments.map(apt => ({
         id: apt.id,
-        amount: totalEarnings,
+        amount: 2,
         date: apt.startTime,
         status: apt.status
       }))

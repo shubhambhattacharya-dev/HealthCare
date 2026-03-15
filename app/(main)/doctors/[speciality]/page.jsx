@@ -1,4 +1,4 @@
-import { getDoctorsBySpeciality } from '@/actions/admin';
+import { getDoctorsBySpecialty } from '@/actions/doctorListing';
 import PageHeader from '@/components/pageHeader';
 import { redirect } from 'next/navigation'; 
 import DoctorCard from '@/components/doctorCard';
@@ -11,14 +11,15 @@ const SpecialityPage = async ({ params }) => {
     redirect('/doctors');
   }
 
-  const { doctors, error } = await getDoctorsBySpeciality(speciality);
+  // Handle URL encoding, plus-signs, and trailing spaces
+  const specialityLabel = decodeURIComponent(speciality).replace(/\+/g, ' ').trim();
+  const { doctors, error } = await getDoctorsBySpecialty(specialityLabel);
 
   if (error) {
     console.error("Error fetching doctors:", error);
     redirect("/doctors"); 
   }
 
-  const specialityLabel = decodeURIComponent(speciality);
 
   return (
     <div className='space-y-6'>

@@ -11,10 +11,10 @@ const DoctorCard = ({ doctor }) => {
   const isAvailable = doctor.availability?.some(slot => slot.status === 'AVAILABLE') || false;
 
   return (
-    <Link href={`/doctors/profile/${doctor.id}`}>
-      
+    <Link href={`/doctors/${doctor.specialty}/${doctor.id}`}>
+
       <Card className="group relative overflow-hidden border-emerald-900/20 hover:border-emerald-500/40 transition-all duration-200 cursor-pointer bg-white/[0.02] hover:bg-emerald-950/20 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-emerald-950/40">
-        
+
         {/* Hover corner glow */}
         <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-emerald-500/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-bl-3xl pointer-events-none" />
 

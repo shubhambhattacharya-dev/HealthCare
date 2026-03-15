@@ -110,26 +110,6 @@ export async function getPendingPayouts() {
   }
 }
 
-export async function getDoctorsBySpeciality(speciality) {
-  try {
-    const doctors = await db.user.findMany({
-      where: {
-        role: "DOCTOR",
-        verificationStatus: "VERIFIED",
-        specialty: speciality,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-
-    return { doctors };
-  } catch (error) {
-    console.error("Error fetching doctors by speciality:", error);
-    return { doctors: [] };
-  }
-}
-
 // update
 
 export async function updateDoctorStatus(formData) {
