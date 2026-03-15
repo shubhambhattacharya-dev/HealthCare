@@ -487,3 +487,42 @@ export async function getDoctorAvailabilityForPatient(doctorId) {
     return { availability: null };
   }
 }
+
+/**
+ * Get current user's (patient) appointments
+ */
+export async function getUserAppointments() {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  try {
+    const user = await db.user.findUnique({
+      where: {
+        clerkUserId: userId,
+      },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const appointments = await db.appointment.findMany({
+      where: {
+        patientId: user.id,
+      },
+      include: {
+        doctor: true,
+      },
+      orderBy: {
+        startTime: "desc",
+      },
+    });
+
+    return { appointments };
+  } catch (error) {
+    throw new Error("Failed to fetch user appointments: " + error.message);
+  }
+}
