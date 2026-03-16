@@ -159,6 +159,9 @@ export async function getDoctorEarnings() {
                 doctorId: doctor.id,
                 status: "COMPLETED",
             },
+            include: {
+                patient: true,
+            },
         });
 
         // Calculate this month's completed appointments
