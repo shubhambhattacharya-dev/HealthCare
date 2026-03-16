@@ -1,7 +1,7 @@
-import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/prisma";
+import crypto from "crypto";
 
 
 const PLAN_MAP = {
@@ -42,23 +42,41 @@ export async function POST(req) {
   const payload = await req.json();
   const body = JSON.stringify(payload);
 
-
-  const wh = new Webhook(WEBHOOK_SECRET);
-
-  let evt;
-
-  try {
-    evt = wh.verify(body, {
-      "svix-id": svix_id,
-      "svix-timestamp": svix_timestamp,
-      "svix-signature": svix_signature,
+  // Verify webhook signature manually using Node.js crypto
+  const signature = svix_signature;
+  const timestamp = svix_timestamp;
+  
+  // Create the signed payload
+  const signedPayload = `${timestamp}.${body}`;
+  
+  // Compute the expected signature
+  const expectedSignature = crypto
+    .createHmac('sha256', WEBHOOK_SECRET)
+    .update(signedPayload)
+    .digest('hex');
+  
+  // Compare signatures (Clerk uses v1 signature format)
+  const svixSignature = signature.split(',').find(s => s.startsWith('v1='));
+  if (!svixSignature) {
+    return new Response("Error occured -- invalid signature format", {
+      status: 400,
     });
-  } catch (err) {
-    console.error("Error verifying webhook:", err);
+  }
+  
+  const actualSignature = svixSignature.replace('v1=', '');
+  const computedSignature = Buffer.from(expectedSignature);
+  const actualSignatureBuffer = Buffer.from(actualSignature);
+  
+  // Use timing-safe comparison to prevent timing attacks
+  if (computedSignature.length !== actualSignatureBuffer.length || 
+      !crypto.timingSafeEqual(computedSignature, actualSignatureBuffer)) {
+    console.error("Error verifying webhook: invalid signature");
     return new Response("Error occured", {
       status: 400,
     });
   }
+
+  const evt = payload;
 
 
   const { id } = evt.data;
