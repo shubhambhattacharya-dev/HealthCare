@@ -11,9 +11,11 @@ const PLAN_MAP = {
   "starter_plan": "starter",
   "pro": "pro",
 
-  // technical Plan IDs (from metadata or system events)
+  // technical Plan IDs (from instance logs)
   "cplan_3AOqkomATB61": "starter",
   "cplan_3AOUqSQYh6y8": "pro",
+  "cplan_3AOmqeky2uwLmoH7ElUqSQYh6y8": "pro", // Confirmed Pro ID
+  "cplan_3AOmJIZs0w9Bq8OCDMqkomATB61": "starter", // Confirmed Starter ID
 };
 
 // Credits per plan (same as credits.js)
@@ -157,9 +159,10 @@ export async function POST(req) {
         if (!planName) {
             const productId = evt.data.product_id;
             const priceId = evt.data.price_id;
+            const planSlug = evt.data.plan?.slug;
             
-            // Try mapping by those as well if PLAN_MAP expands in future
-            planName = PLAN_MAP[productId] || PLAN_MAP[priceId];
+            // Try mapping by those as well
+            planName = PLAN_MAP[productId] || PLAN_MAP[priceId] || PLAN_MAP[planSlug];
             
             // Fallback: If still not found, check if plan_id is actually the string planName directly
             if (plan_id === 'pro' || plan_id === 'starter' || plan_id === 'free_user') {
