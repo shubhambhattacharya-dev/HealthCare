@@ -379,19 +379,22 @@ export async function getAvailableTimeSlots(doctorId) {
       return { slots: [] };
     }
 
-    // Get the next 4 days
+    // Get the next 5 days to ensure we cover all timezones
     const now = new Date();
-    const days = [now, addDays(now, 1), addDays(now, 2), addDays(now, 3)];
+    // Use an earlier start to ensure we don't miss "today" in any timezone
+    const days = [];
+    for (let i = 0; i < 5; i++) {
+      days.push(addDays(now, i));
+    }
 
-    // Fetch existing appointments for the doctor over the next 4 days
-    // Only get appointments that start in the future and within our range
-    const lastDay = endOfDay(days[3]);
+    // Fetch existing appointments for the doctor over the next 5 days
+    const lastDay = endOfDay(days[days.length - 1]);
     const existingAppointments = await db.appointment.findMany({
       where: {
         doctorId: doctor.id,
         status: "SCHEDULED",
         startTime: {
-          gte: now, // Only get future appointments
+          gte: addDays(now, -1), // Get some overlap
           lte: lastDay,
         },
       },
@@ -399,26 +402,17 @@ export async function getAvailableTimeSlots(doctorId) {
 
     const availableSlotsByDay = {};
 
-    // For each of the next 4 days, generate available slots
+    // For each day, generate available slots
     for (const day of days) {
       const dayString = format(day, "yyyy-MM-dd");
       availableSlotsByDay[dayString] = [];
 
-      // Create a copy of the availability start/end times for this day
       const availabilityStart = new Date(availability.startTime);
       const availabilityEnd = new Date(availability.endTime);
 
-      // Set the day to the current day we're processing
-      availabilityStart.setFullYear(
-        day.getFullYear(),
-        day.getMonth(),
-        day.getDate()
-      );
-      availabilityEnd.setFullYear(
-        day.getFullYear(),
-        day.getMonth(),
-        day.getDate()
-      );
+      // Apply the time from availability to the target day
+      availabilityStart.setFullYear(day.getFullYear(), day.getMonth(), day.getDate());
+      availabilityEnd.setFullYear(day.getFullYear(), day.getMonth(), day.getDate());
 
       let current = new Date(availabilityStart);
       const end = new Date(availabilityEnd);
@@ -429,8 +423,10 @@ export async function getAvailableTimeSlots(doctorId) {
       ) {
         const next = addMinutes(current, 30);
 
-        // Skip past slots
-        if (isBefore(current, now)) {
+        // Skip slots that are more than 15 minutes in the past
+        // This gives a grace period for "right now" bookings
+        const gracePeriod = addMinutes(now, -15);
+        if (isBefore(current, gracePeriod)) {
           current = next;
           continue;
         }
@@ -462,15 +458,17 @@ export async function getAvailableTimeSlots(doctorId) {
       }
     }
 
-    // Convert to array of slots grouped by day for easier consumption by the UI
-    const result = Object.entries(availableSlotsByDay).map(([date, slots]) => ({
-      date,
-      displayDate:
-        slots.length > 0
-          ? slots[0].day
-          : format(new Date(date), "EEEE, MMMM d"),
-      slots,
-    }));
+    // Convert to array of slots grouped by day
+    const result = Object.entries(availableSlotsByDay)
+      .filter(([_, slots]) => true) // Keep all days for now to see the tabs
+      .map(([date, slots]) => ({
+        date,
+        displayDate:
+          slots.length > 0
+            ? slots[0].day
+            : format(new Date(date), "EEEE, MMMM d"),
+        slots,
+      }));
 
     return { days: result };
   } catch (error) {
