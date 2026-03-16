@@ -2,7 +2,7 @@ import { Stethoscope } from "lucide-react";
 import PageHeader from "@/components/pageHeader";
 
 export const metadata = {
-  title: "Doctor Dashboard - MediMeet",
+  title: "Doctor Dashboard - DocNow",
   description: "Manage your appointments and availability",
 };
 

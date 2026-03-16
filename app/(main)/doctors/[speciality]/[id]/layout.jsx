@@ -9,13 +9,13 @@ export async function generateMetadata({ params }) {
 
   if (!doctor) {
     return {
-      title: "Doctor Not Found - MediMeet",
+      title: "Doctor Not Found - DocNow",
       description: "The requested doctor profile could not be found.",
     };
   }
 
   return {
-    title: `Dr. ${doctor.name} - MediMeet`,
+    title: `Dr. ${doctor.name} - DocNow`,
     description: `Book an appointment with Dr. ${doctor.name}, ${doctor.specialty} specialist with ${doctor.experience} years of experience.`,
   };
 }
