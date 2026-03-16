@@ -13,6 +13,8 @@
     "@clerk/themes": "^2.4.55",
     "@hookform/resolvers": "^5.2.2",
     "@prisma/client": "^6.19.0",
+    "@vonage/auth": "^1.14.3",
+    "@vonage/server-sdk": "^3.26.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
@@ -27,10 +29,9 @@
     "react-hook-form": "^7.71.2",
     "react-spinners": "^0.17.0",
     "sonner": "^2.0.7",
+    "svix": "^1.88.0",
     "tailwind-merge": "^3.5.0",
-    "zod": "^4.3.6",
-    "@vonage/server-sdk": "^3.26.4",
-    "@vonage/auth": "^1.14.3"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
