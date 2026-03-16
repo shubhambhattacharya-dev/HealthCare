@@ -136,6 +136,7 @@ enum TransactionType {
   APPOINTMENT_EARNING
   REFUND
   ADMIN_ADJUSTMENT
+  PAYOUT
 }
 
 model Payout {

@@ -96,11 +96,14 @@ export async function getPendingPayouts() {
       },
     });
 
-    // Transform to include doctorName
+    // Transform to include doctorName and serialize Decimals
     const transformedPayouts = payouts.map(payout => ({
       ...payout,
       doctorName: payout.doctor?.name || "Unknown Doctor",
       email: payout.doctor?.email || payout.payoutEmail,
+      amount: Number(payout.amount),
+      platformFee: Number(payout.platformFee),
+      netAmount: Number(payout.netAmount),
     }));
 
     return { payouts: transformedPayouts };
@@ -185,20 +188,68 @@ export async function updatePayoutStatus(formData) {
   }
 
   try {
-    await db.payout.update({
-      where: {
-        id: payoutId,
-      },
-      data: {
-        status: status,
-        processedAt: new Date(),
-      },
+    const result = await db.$transaction(async (tx) => {
+      // 1. Get payout details
+      const payout = await tx.payout.findUnique({
+        where: { id: payoutId },
+        include: { doctor: true }
+      });
+
+      if (!payout) throw new Error("Payout not found");
+      if (payout.status !== "PROCESSING") throw new Error("Payout already processed");
+
+      // 2. Update payout status
+      const updatedPayout = await tx.payout.update({
+        where: { id: payoutId },
+        data: {
+          status: status,
+          processedAt: new Date(),
+        },
+      });
+
+      // 3. If PROCESSED, deduct credits from doctor and log transaction
+      if (status === "PROCESSED") {
+        const creditCount = payout.credits;
+
+        // Deduct credits from user
+        await tx.user.update({
+          where: { id: payout.doctorId },
+          data: {
+            credits: {
+              decrement: creditCount
+            }
+          }
+        });
+
+        // Create a credit transaction record for the payout deduction
+        await tx.creditTransaction.create({
+          data: {
+            userId: payout.doctorId,
+            amount: -creditCount, // Negative for deduction
+            type: "PAYOUT",
+            referenceId: payout.id,
+            description: `Payout processed for ${creditCount} credits`,
+          }
+        });
+      }
+
+      return updatedPayout;
     });
 
     revalidatePath("/admin");
-    return { success: true, message: `Payout ${status.toLowerCase()} successfully` };
+    revalidatePath("/doctor");
+
+    // Serialize Decimal fields for the result
+    const serializedResult = {
+      ...result,
+      amount: Number(result.amount),
+      platformFee: Number(result.platformFee),
+      netAmount: Number(result.netAmount),
+    };
+
+    return { success: true, message: `Payout ${status.toLowerCase()} successfully`, payout: serializedResult };
   } catch (error) {
     console.error("Error updating payout status:", error);
-    throw new Error("Internal Server Error");
+    throw new Error(error.message || "Internal Server Error");
   }
 }
