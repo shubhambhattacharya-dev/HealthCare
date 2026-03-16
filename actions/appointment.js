@@ -11,8 +11,14 @@ import fs from "fs";
 import path from "path";
 
 // Initialize Vonage Video API client
-const privateKeyPath = path.join(process.cwd(), "lib", "private.key");
-const privateKey = fs.readFileSync(privateKeyPath, "utf8");
+// Use environment variable if available, otherwise read from file (for local development)
+let privateKey;
+if (process.env.VONAGE_PRIVATE_KEY) {
+  privateKey = process.env.VONAGE_PRIVATE_KEY;
+} else {
+  const privateKeyPath = path.join(process.cwd(), "lib", "private.key");
+  privateKey = fs.readFileSync(privateKeyPath, "utf8");
+}
 
 const credentials = new Auth({
   applicationId: process.env.NEXT_PUBLIC_VONAGE_APPLICATION_ID,
