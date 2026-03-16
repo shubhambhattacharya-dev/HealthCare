@@ -1,0 +1,257 @@
+﻿RECENT APPOINTMENTS:
+[
+  {
+    "id": "a8983786-508d-48a2-8fe6-52a738144236",
+    "patientId": "ad1a1f09-77cd-4cf5-b35d-6e0de5829adf",
+    "doctorId": "947f238f-5ab6-44b3-95b2-56dd5c41dbdb",
+    "startTime": "2026-03-16T17:53:00.000Z",
+    "endTime": "2026-03-16T18:23:00.000Z",
+    "status": "COMPLETED",
+    "notes": null,
+    "patientDescription": "i am feeling sick ",
+    "videoSessionId": "1_MX4yZDY1M2QzYi05MmI3LTQ3ODUtODI1OS0wNDBiNWViZjg2NjZ-fjE3NzM2ODM0NzQ1OTV-YVAwVTc3Wkp5Mmc1MXFReS91dHNTektBfn5-",
+    "videoSessionToken": null,
+    "createdAt": "2026-03-16T17:51:14.629Z",
+    "updatedAt": "2026-03-16T17:52:50.948Z",
+    "patient": {
+      "name": "The Creator",
+      "email": "yesiamcreator7@gmail.com",
+      "credits": 22
+    },
+    "doctor": {
+      "name": "Shubham Bhattacharya",
+      "email": "shubhambhattacharya107@gmail.com",
+      "credits": 40
+    }
+  },
+  {
+    "id": "7336f117-059b-44c6-9bb5-b3b0220bd4d6",
+    "patientId": "ad1a1f09-77cd-4cf5-b35d-6e0de5829adf",
+    "doctorId": "947f238f-5ab6-44b3-95b2-56dd5c41dbdb",
+    "startTime": "2026-03-16T17:46:00.000Z",
+    "endTime": "2026-03-16T18:16:00.000Z",
+    "status": "CANCELLED",
+    "notes": null,
+    "patientDescription": "i am feeling sick .",
+    "videoSessionId": "2_MX4yZDY1M2QzYi05MmI3LTQ3ODUtODI1OS0wNDBiNWViZjg2NjZ-fjE3NzM2ODMxMzY3NTR-OVRwcVVzSE1qdDNFeGRCUlJkOEJ6Wndvfn5-",
+    "videoSessionToken": null,
+    "createdAt": "2026-03-16T17:45:36.805Z",
+    "updatedAt": "2026-03-16T17:48:36.038Z",
+    "patient": {
+      "name": "The Creator",
+      "email": "yesiamcreator7@gmail.com",
+      "credits": 22
+    },
+    "doctor": {
+      "name": "Shubham Bhattacharya",
+      "email": "shubhambhattacharya107@gmail.com",
+      "credits": 40
+    }
+  },
+  {
+    "id": "15a6012f-8dbf-434d-b47a-0e5ed6b6f4ee",
+    "patientId": "a1247f4d-8b11-4c68-9b31-b1d42c4cd2ba",
+    "doctorId": "d5d69653-d5c9-44b3-815d-7e769ba53249",
+    "startTime": "2026-03-16T13:15:00.000Z",
+    "endTime": "2026-03-16T13:45:00.000Z",
+    "status": "COMPLETED",
+    "notes": null,
+    "patientDescription": "i am feeling ill",
+    "videoSessionId": "2_MX4yZDY1M2QzYi05MmI3LTQ3ODUtODI1OS0wNDBiNWViZjg2NjZ-fjE3NzM2NjY0NjU5MDF-RytFemFkMnBXa0FPeFpKNm45NlNaTDExfn5-",
+    "videoSessionToken": null,
+    "createdAt": "2026-03-16T13:07:45.946Z",
+    "updatedAt": "2026-03-16T13:10:10.044Z",
+    "patient": {
+      "name": "shubham bhattacharya",
+      "email": "get.input.2025@gmail.com",
+      "credits": 0
+    },
+    "doctor": {
+      "name": "SHUBHAM BHATTACHARYA",
+      "email": "2305101010231@paruluniversity.ac.in",
+      "credits": 6
+    }
+  },
+  {
+    "id": "b4129205-abb3-4c0f-afe8-7d7f073a7e76",
+    "patientId": "947f238f-5ab6-44b3-95b2-56dd5c41dbdb",
+    "doctorId": "d5d69653-d5c9-44b3-815d-7e769ba53249",
+    "startTime": "2026-03-16T03:13:00.000Z",
+    "endTime": "2026-03-16T03:43:00.000Z",
+    "status": "COMPLETED",
+    "notes": null,
+    "patientDescription": "hii i am feeeling sick",
+    "videoSessionId": "1_MX4yZDY1M2QzYi05MmI3LTQ3ODUtODI1OS0wNDBiNWViZjg2NjZ-fjE3NzM2MzA1NjgwNjB-YkNyYW5BMnpObHNBU1REZVJDM3VXZHVjfn5-",
+    "videoSessionToken": null,
+    "createdAt": "2026-03-16T03:09:29.702Z",
+    "updatedAt": "2026-03-16T13:04:29.706Z",
+    "patient": {
+      "name": "Shubham Bhattacharya",
+      "email": "shubhambhattacharya107@gmail.com",
+      "credits": 40
+    },
+    "doctor": {
+      "name": "SHUBHAM BHATTACHARYA",
+      "email": "2305101010231@paruluniversity.ac.in",
+      "credits": 6
+    }
+  },
+  {
+    "id": "be4bd73e-4e9c-4e79-952f-17e9d0a6a781",
+    "patientId": "947f238f-5ab6-44b3-95b2-56dd5c41dbdb",
+    "doctorId": "d5d69653-d5c9-44b3-815d-7e769ba53249",
+    "startTime": "2026-03-16T04:29:00.000Z",
+    "endTime": "2026-03-16T04:59:00.000Z",
+    "status": "COMPLETED",
+    "notes": null,
+    "patientDescription": "i am feeing ill",
+    "videoSessionId": "1_MX4yZDY1M2QzYi05MmI3LTQ3ODUtODI1OS0wNDBiNWViZjg2NjZ-fjE3NzM2MzUyMjAwMzZ-N0xRUmp6cXMzdS8vVUhrajRRRERUYU5zfn5-",
+    "videoSessionToken": null,
+    "createdAt": "2026-03-16T04:27:01.446Z",
+    "updatedAt": "2026-03-16T13:04:27.460Z",
+    "patient": {
+      "name": "Shubham Bhattacharya",
+      "email": "shubhambhattacharya107@gmail.com",
+      "credits": 40
+    },
+    "doctor": {
+      "name": "SHUBHAM BHATTACHARYA",
+      "email": "2305101010231@paruluniversity.ac.in",
+      "credits": 6
+    }
+  }
+]
+
+RECENT TRANSACTIONS:
+[
+  {
+    "id": "b5779e15-0bbe-4006-bed0-ae92e9cfaa4e",
+    "userId": "947f238f-5ab6-44b3-95b2-56dd5c41dbdb",
+    "amount": 2,
+    "type": "APPOINTMENT_EARNING",
+    "referenceId": null,
+    "description": "Appointment with The Creator",
+    "createdAt": "2026-03-16T17:51:14.626Z",
+    "user": {
+      "name": "Shubham Bhattacharya",
+      "email": "shubhambhattacharya107@gmail.com"
+    }
+  },
+  {
+    "id": "8159ffce-21b1-4665-91a1-16b860f019b2",
+    "userId": "ad1a1f09-77cd-4cf5-b35d-6e0de5829adf",
+    "amount": -2,
+    "type": "APPOINTMENT_DEDUCTION",
+    "referenceId": null,
+    "description": "Appointment with Dr. Shubham Bhattacharya",
+    "createdAt": "2026-03-16T17:51:14.620Z",
+    "user": {
+      "name": "The Creator",
+      "email": "yesiamcreator7@gmail.com"
+    }
+  },
+  {
+    "id": "1cc314b7-96b9-4914-9f6f-5ad9bce1bf68",
+    "userId": "947f238f-5ab6-44b3-95b2-56dd5c41dbdb",
+    "amount": -2,
+    "type": "REFUND",
+    "referenceId": null,
+    "description": "Deduction for cancelled appointment with The Creator",
+    "createdAt": "2026-03-16T17:48:36.046Z",
+    "user": {
+      "name": "Shubham Bhattacharya",
+      "email": "shubhambhattacharya107@gmail.com"
+    }
+  },
+  {
+    "id": "aaa87e04-2c96-438c-9390-16595bb16893",
+    "userId": "ad1a1f09-77cd-4cf5-b35d-6e0de5829adf",
+    "amount": 2,
+    "type": "REFUND",
+    "referenceId": null,
+    "description": "Refund for cancelled appointment with Dr. Shubham Bhattacharya",
+    "createdAt": "2026-03-16T17:48:36.043Z",
+    "user": {
+      "name": "The Creator",
+      "email": "yesiamcreator7@gmail.com"
+    }
+  },
+  {
+    "id": "3addc0f7-1715-4b6e-9b21-651c8b97cd27",
+    "userId": "947f238f-5ab6-44b3-95b2-56dd5c41dbdb",
+    "amount": 2,
+    "type": "APPOINTMENT_EARNING",
+    "referenceId": null,
+    "description": "Appointment with The Creator",
+    "createdAt": "2026-03-16T17:45:36.802Z",
+    "user": {
+      "name": "Shubham Bhattacharya",
+      "email": "shubhambhattacharya107@gmail.com"
+    }
+  },
+  {
+    "id": "5fb69f8b-0690-442e-981d-8f4af7454021",
+    "userId": "ad1a1f09-77cd-4cf5-b35d-6e0de5829adf",
+    "amount": -2,
+    "type": "APPOINTMENT_DEDUCTION",
+    "referenceId": null,
+    "description": "Appointment with Dr. Shubham Bhattacharya",
+    "createdAt": "2026-03-16T17:45:36.796Z",
+    "user": {
+      "name": "The Creator",
+      "email": "yesiamcreator7@gmail.com"
+    }
+  },
+  {
+    "id": "0a4d69ee-3458-4353-bfb7-0f5fea32f493",
+    "userId": "ad1a1f09-77cd-4cf5-b35d-6e0de5829adf",
+    "amount": 22,
+    "type": "CREDIT_PURCHASE",
+    "referenceId": null,
+    "description": "Monthly credits for pro plan",
+    "createdAt": "2026-03-16T17:32:49.231Z",
+    "user": {
+      "name": "The Creator",
+      "email": "yesiamcreator7@gmail.com"
+    }
+  },
+  {
+    "id": "af3b33fb-a72f-4dc1-acee-991bd6debafb",
+    "userId": "ad1a1f09-77cd-4cf5-b35d-6e0de5829adf",
+    "amount": 2,
+    "type": "ADMIN_ADJUSTMENT",
+    "referenceId": null,
+    "description": "Welcome credits",
+    "createdAt": "2026-03-16T16:46:39.482Z",
+    "user": {
+      "name": "The Creator",
+      "email": "yesiamcreator7@gmail.com"
+    }
+  },
+  {
+    "id": "5a1faa5b-d42d-4f8e-a30b-a44bdf1fc3bb",
+    "userId": "d5d69653-d5c9-44b3-815d-7e769ba53249",
+    "amount": 2,
+    "type": "APPOINTMENT_EARNING",
+    "referenceId": null,
+    "description": "Appointment with shubham bhattacharya",
+    "createdAt": "2026-03-16T13:07:45.943Z",
+    "user": {
+      "name": "SHUBHAM BHATTACHARYA",
+      "email": "2305101010231@paruluniversity.ac.in"
+    }
+  },
+  {
+    "id": "6131ba22-b35b-479a-9bc3-86c82375f7ae",
+    "userId": "a1247f4d-8b11-4c68-9b31-b1d42c4cd2ba",
+    "amount": -2,
+    "type": "APPOINTMENT_DEDUCTION",
+    "referenceId": null,
+    "description": "Appointment with Dr. SHUBHAM BHATTACHARYA",
+    "createdAt": "2026-03-16T13:07:45.938Z",
+    "user": {
+      "name": "shubham bhattacharya",
+      "email": "get.input.2025@gmail.com"
+    }
+  }
+]

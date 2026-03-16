@@ -187,11 +187,18 @@ export async function getDoctorEarnings() {
         const availableCredits = doctor.credits;
         const availablePayout = availableCredits * DOCTOR_EARNINGS_PER_CREDIT;
 
+        // Return earnings in the format expected by the DoctorEarnings component
         return {
             earnings: {
+                totalCredits: doctor.credits,
+                appointmentsCount: completedAppointments.length,
+                appointments: completedAppointments.map(apt => ({
+                    id: apt.id,
+                    date: apt.createdAt,
+                    patientName: apt.patient?.name || "Patient"
+                })),
                 totalEarnings,
                 thisMonthEarnings,
-                completedAppointments: completedAppointments.length,
                 averageEarningsPerMonth,
                 availableCredits,
                 availablePayout,
