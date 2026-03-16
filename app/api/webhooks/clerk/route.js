@@ -144,11 +144,38 @@ export async function POST(req) {
 
       case "subscription.created":
       case "subscription.updated": {
-        const { clerk_user_id, plan_id, status } = evt.data;
-        console.log(`Processing subscription: user=${clerk_user_id}, plan_id=${plan_id}, status=${status}`);
-        const planName = PLAN_MAP[plan_id];
-        console.log(`Mapped plan_id ${plan_id} to internal plan name: ${planName}`);
+        // Clerk Billing payloads often use `user_id` not `clerk_user_id`
+        const clerk_user_id = evt.data.clerk_user_id || evt.data.user_id;
+        let { plan_id, status } = evt.data;
+        
+        // Some Clerk payloads might have the plan info structured differently 
+        // e.g., evt.data.items[0].plan.id (Stripe-like) or just rely on fallback
+        // Since we don't know the exact ID, let's map whatever comes in:
+        let planName = PLAN_MAP[plan_id];
+        
+        // If planName not found, let's try to infer from product_id or price_id if they exist
+        if (!planName) {
+            const productId = evt.data.product_id;
+            const priceId = evt.data.price_id;
+            
+            // Try mapping by those as well if PLAN_MAP expands in future
+            planName = PLAN_MAP[productId] || PLAN_MAP[priceId];
+            
+            // Fallback: If still not found, check if plan_id is actually the string planName directly
+            if (plan_id === 'pro' || plan_id === 'starter' || plan_id === 'free_user') {
+                planName = plan_id;
+            }
+        }
+        
+        console.log(`Processing subscription: user=${clerk_user_id}, plan_id=${plan_id}, inferred planName=${planName}, status=${status}`);
 
+        // If we still can't map the planName, but the checkout was for a plan, log an error.
+        // For fallback, we'll try to extract "pro" or "starter" from the plan_id string directly.
+        if (!planName && plan_id) {
+           if (plan_id.toLowerCase().includes("pro")) planName = "pro";
+           else if (plan_id.toLowerCase().includes("starter")) planName = "starter";
+        }
+        
         if (status === "active" && planName) {
           const user = await db.user.findUnique({
             where: { clerkUserId: clerk_user_id },
@@ -198,7 +225,13 @@ export async function POST(req) {
 
       case "subscription.past_due":
       case "subscription.cancelled": {
-        const { clerk_user_id } = evt.data;
+        const clerk_user_id = evt.data.clerk_user_id || evt.data.user_id;
+        
+        if (!clerk_user_id) {
+            console.error("No user ID found in cancellation webhook.");
+            break;
+        }
+
         await db.user.update({
           where: { clerkUserId: clerk_user_id },
           data: {

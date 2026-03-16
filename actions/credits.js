@@ -43,6 +43,11 @@ export async function checkAndAllocateCredits() {
 
     // determine plan - get from user record or default to free_user
     let currentPlan = dbUser.plan || "free_user";
+
+    // Safety net in case the db somehow stored the wrong Clerk plan key directly
+    if (currentPlan === 'starter_plan' || currentPlan.includes('starter')) currentPlan = 'starter';
+    if (currentPlan.includes('pro')) currentPlan = 'pro';
+
     let creditsForPlan = PLAN_CREDITS[currentPlan] || PLAN_CREDITS.free_user;
 
     // Get current credits from user record (already calculated from transactions)
