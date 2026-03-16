@@ -1,9 +1,0 @@
---- STARTING PAYOUT FLOW TEST ---
-Initial Credits for Dr. SHUBHAM BHATTACHARYA: 12
-Requesting Payout for 5 credits ($40 net)...
-Payout Requested. ID: 7d6568be-44cc-49e1-bfce-b05237049a3b, Status: PROCESSING
-Admin Approving Payout...
-Payout Processed. ID: 7d6568be-44cc-49e1-bfce-b05237049a3b, Status: PROCESSED
-Final Credits for Dr. SHUBHAM BHATTACHARYA: 7
-Expected Credits: 7
-✅ TEST PASSED: Credits correctly deducted.
