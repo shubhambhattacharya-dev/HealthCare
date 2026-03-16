@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/prisma";
 import crypto from "crypto";
+import { format } from "date-fns";
 
 
 const PLAN_MAP = {
@@ -13,6 +14,13 @@ const PLAN_MAP = {
   // technical Plan IDs (from metadata or system events)
   "cplan_3AOqkomATB61": "starter",
   "cplan_3AOUqSQYh6y8": "pro",
+};
+
+// Credits per plan (same as credits.js)
+const PLAN_CREDITS = {
+  free_user: 2,
+  starter: 10,
+  pro: 24,
 };
 
 export async function POST(req) {
@@ -46,32 +54,43 @@ export async function POST(req) {
   const signature = svix_signature;
   const timestamp = svix_timestamp;
   
-  // Create the signed payload
-  const signedPayload = `${timestamp}.${body}`;
+  // Create the signed payload (msgId.timestamp.body)
+  const signedPayload = `${svix_id}.${timestamp}.${body}`;
   
-  // Compute the expected signature
+  // Svix secrets are prefixed with "whsec_" and base64-encoded
+  // We need to strip the prefix and base64-decode the secret
+  const secretBytes = WEBHOOK_SECRET.startsWith('whsec_')
+    ? Buffer.from(WEBHOOK_SECRET.slice(6), 'base64')
+    : Buffer.from(WEBHOOK_SECRET, 'base64');
+  
+  // Compute the expected signature using HMAC-SHA256 with base64 output
   const expectedSignature = crypto
-    .createHmac('sha256', WEBHOOK_SECRET)
+    .createHmac('sha256', secretBytes)
     .update(signedPayload)
-    .digest('hex');
+    .digest('base64');
   
-  // Compare signatures (Clerk uses v1 signature format)
-  const svixSignature = signature.split(',').find(s => s.startsWith('v1='));
-  if (!svixSignature) {
-    return new Response("Error occured -- invalid signature format", {
-      status: 400,
-    });
+  // Compare signatures — Svix sends v1,<base64sig> format
+  // There may be multiple signatures separated by spaces
+  const passedSignatures = signature.split(' ');
+  
+  let signatureValid = false;
+  for (const versionedSig of passedSignatures) {
+    const [version, sig] = versionedSig.split(',');
+    if (version !== 'v1') continue;
+    
+    const expectedBuffer = Buffer.from(expectedSignature);
+    const actualBuffer = Buffer.from(sig);
+    
+    if (expectedBuffer.length === actualBuffer.length &&
+        crypto.timingSafeEqual(expectedBuffer, actualBuffer)) {
+      signatureValid = true;
+      break;
+    }
   }
   
-  const actualSignature = svixSignature.replace('v1=', '');
-  const computedSignature = Buffer.from(expectedSignature);
-  const actualSignatureBuffer = Buffer.from(actualSignature);
-  
-  // Use timing-safe comparison to prevent timing attacks
-  if (computedSignature.length !== actualSignatureBuffer.length || 
-      !crypto.timingSafeEqual(computedSignature, actualSignatureBuffer)) {
+  if (!signatureValid) {
     console.error("Error verifying webhook: invalid signature");
-    return new Response("Error occured", {
+    return new Response("Error occured -- invalid signature", {
       status: 400,
     });
   }
@@ -135,18 +154,50 @@ export async function POST(req) {
             where: { clerkUserId: clerk_user_id },
           });
 
-          await db.user.update({
-            where: { clerkUserId: clerk_user_id },
-            data: {
-              plan: planName,
-              ...(user?.role === "UNASSIGNED" ? { role: "PATIENT" } : {}),
-            },
+          if (!user) {
+            console.error(`User not found for clerkUserId: ${clerk_user_id}`);
+            break;
+          }
+
+          // Calculate credits for the new plan
+          const creditsForPlan = PLAN_CREDITS[planName] || PLAN_CREDITS.free_user;
+          const currentCredits = user.credits || 0;
+          const creditsNeeded = creditsForPlan - currentCredits;
+
+          // Update plan and allocate credits in a transaction
+          await db.$transaction(async (tx) => {
+            // 1. Update the user's plan (and role if UNASSIGNED)
+            await tx.user.update({
+              where: { clerkUserId: clerk_user_id },
+              data: {
+                plan: planName,
+                ...(user.role === "UNASSIGNED" ? { role: "PATIENT" } : {}),
+                // Only top up if needed
+                ...(creditsNeeded > 0 ? { credits: { increment: creditsNeeded } } : {}),
+              },
+            });
+
+            // 2. Create credit transaction if credits were allocated
+            if (creditsNeeded > 0) {
+              const currentMonth = format(new Date(), "MM-yyyy");
+              await tx.creditTransaction.create({
+                data: {
+                  userId: user.id,
+                  amount: creditsNeeded,
+                  type: "CREDIT_PURCHASE",
+                  description: `Monthly credits for ${planName} plan`,
+                },
+              });
+            }
           });
+
+          console.log(`Updated user ${clerk_user_id}: plan=${planName}, credits allocated=${Math.max(0, creditsNeeded)}`);
         }
         break;
       }
 
-      case "subscription.past_due": {
+      case "subscription.past_due":
+      case "subscription.cancelled": {
         const { clerk_user_id } = evt.data;
         await db.user.update({
           where: { clerkUserId: clerk_user_id },
@@ -154,6 +205,7 @@ export async function POST(req) {
             plan: "free_user",
           },
         });
+        console.log(`Downgraded user ${clerk_user_id} to free_user plan`);
         break;
       }
 

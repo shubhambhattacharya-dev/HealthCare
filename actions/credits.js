@@ -37,8 +37,8 @@ export async function checkAndAllocateCredits() {
       return { success: false, message: "User not found" };
     }
 
-    if (dbUser.role !== "PATIENT" && dbUser.role !== "ADMIN") {
-      return { success: false, message: "Only patients and admins receive credits" };
+    if (dbUser.role === "DOCTOR") {
+      return { success: false, message: "Doctors earn credits through appointments" };
     }
 
     // determine plan - get from user record or default to free_user
@@ -83,7 +83,7 @@ export async function checkAndAllocateCredits() {
       await tx.creditTransaction.create({
         data: {
           userId: dbUser.id,
-          type: "ADMIN_ADJUSTMENT",
+          type: "CREDIT_PURCHASE",
           description: `Monthly credits for ${currentPlan} plan`,
           amount: creditsNeeded,
         },
